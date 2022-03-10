@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <nav class="navbar text-center">
+        <span class="navbar-brand h1 m-auto" id="time">12:12</span>
+    </nav>
+
+    <div class="container employerContainer">
+        <div class="row">
+
+            {% for employer in employers %}
+                <div class="employerBox col-sm-6 col-md-3 col-lg-3">
+                    <div class="card employer" style="width: 18rem;" id="user{{ employer.id }}">
+                        <img class="card-img-top" src="/assets/img/profile.png">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ employer.firstname }}. {{ employer.lastname|slice(0, 1) }}</h5>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end userCheckInWindow" tabindex="-1" id="userCheckInWindow" aria-labelledby="offcanvasRightLabel">
+
+    </div>
+{% endblock %}

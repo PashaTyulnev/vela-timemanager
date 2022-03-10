@@ -2,30 +2,30 @@
 
 namespace App\Repository;
 
-use App\Entity\Timeentry;
+use App\Entity\Employer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Timeentry|null find($id, $lockMode = null, $lockVersion = null)
- * @method Timeentry|null findOneBy(array $criteria, array $orderBy = null)
- * @method Timeentry[]    findAll()
- * @method Timeentry[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Employer|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Employer|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Employer[]    findAll()
+ * @method Employer[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class TimeentryRepository extends ServiceEntityRepository
+class EmployerRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Timeentry::class);
+        parent::__construct($registry, Employer::class);
     }
 
     /**
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function add(Timeentry $entity, bool $flush = true): void
+    public function add(Employer $entity, bool $flush = true): void
     {
         $this->_em->persist($entity);
         if ($flush) {
@@ -37,7 +37,7 @@ class TimeentryRepository extends ServiceEntityRepository
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function remove(Timeentry $entity, bool $flush = true): void
+    public function remove(Employer $entity, bool $flush = true): void
     {
         $this->_em->remove($entity);
         if ($flush) {
@@ -46,15 +46,15 @@ class TimeentryRepository extends ServiceEntityRepository
     }
 
     // /**
-    //  * @return Timeentry[] Returns an array of Timeentry objects
+    //  * @return Employer[] Returns an array of Employer objects
     //  */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('t.id', 'ASC')
+            ->orderBy('e.id', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
@@ -63,10 +63,10 @@ class TimeentryRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Timeentry
+    public function findOneBySomeField($value): ?Employer
     {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.exampleField = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()

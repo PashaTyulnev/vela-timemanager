@@ -1,4 +1,8 @@
 security:
+    role_hierarchy:
+        ROLE_BAR_MAIN: ROLE_BAR_MAIN
+        ROLE_ADMIN: ROLE_USER
+
     enable_authenticator_manager: true
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
@@ -23,17 +27,15 @@ security:
             form_login:
                 login_path: login
                 check_path: login
+                default_target_path: mainBar
+            logout:
+                path: logout
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:

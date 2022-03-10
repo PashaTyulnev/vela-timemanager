@@ -1,3 +1,85 @@
 .card-body{
     background: #f4ebe8;
 }
+body{
+    background-color: ivory;
+    overflow-y: hidden; /* Hide vertical scrollbar */
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+.navbar{
+    background-color: ivory;
+}
+.employerBox{
+    margin-bottom: 2em;
+}
+.employerContainer{
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+.card-title{
+    text-align: center;
+}
+.card{
+    width:100%!important;
+}
+.time{
+    text-align: center!important;
+}
+.offcanvas-end{
+    width: 100%!important;
+}
+
+.userCheckInWindow{
+    background-color: #d2c595;
+}
+.checkin svg,.pause svg,.checkout svg{
+    transition: 0.5s;
+}
+.checkin svg{
+    color:#7B927D;
+}
+.pause svg{
+    color:#6C7691;
+    transform: scale(0.85);
+}
+.checkout svg{
+    color:#916C79;
+}
+
+.checkin svg:hover{
+    transform: scale(0.9);
+}
+.pause svg:hover{
+    transform: scale(0.75);
+}
+.checkout svg:hover{
+    transform: scale(0.9);
+}
+
+.exitCheckin{
+    width: 3rem;
+    color:#515151;
+    transition: 0.5s;
+}
+
+.exitCheckin:hover{
+    transform: scale(0.9);
+}
+.userTimeInfo{
+    margin-top: 4vh!important;
+    margin-bottom: 2vh;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: #e7d9a6;
+}
+.checkinGreeting{
+    font-size: 4rem;
+    color: #515151;
+}
+.checkInSubInfo{
+    font-style: italic;
+    color: #515151;
+}
+.error{
+    color: #8f4a57;
+}
