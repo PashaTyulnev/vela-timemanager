@@ -15,7 +15,9 @@
             <div class="col-6">
                 <div class="userTimeInfo">
                     <h1 class="text-center mt-3 checkinGreeting">Hallo, {{ employer.firstname }} !</h1>
-                    <p class="checkInSubInfo">Du arbeitest heute schon xx:xx. </p>
+                    {% if workStartToday is not null %}
+                    <p class="checkInSubInfo">Letzter Checkin {{ workStartToday }}. </p>
+                    {% endif %}
                 </div>
 
             </div>
@@ -31,7 +33,7 @@
             <div class="col">
             </div>
             <div class="col checkin">
-                <form method="post" action="/checkin">
+                <form method="post" action="/checkin" class="checkInAction">
                     <input type="hidden" name="userID" value="{{ employer.id }}">
                     <button type="submit" class="btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="currentColor"
@@ -45,7 +47,7 @@
                 </form>
             </div>
             <div class="col pause">
-                <form method="post" action="/pause">
+                <form method="post" action="/pause" class="checkInAction">
                     <input type="hidden" name="userID" value="{{ employer.id }}">
                     <button type="submit" class="btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="currentColor"
@@ -56,7 +58,7 @@
                 </form>
             </div>
             <div class="col checkout">
-                <form method="post" action="/checkout">
+                <form method="post" action="/checkout" class="checkInAction">
                     <input type="hidden" name="userID" value="{{ employer.id }}">
                     <button type="submit" class="btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="currentColor"
@@ -70,6 +72,9 @@
                 </form>
             </div>
             <div class="col">
+            </div>
+            <div class="checkInActionError">
+              <p id="checkInActionError"></p>
             </div>
         </div>
     {% endif %}

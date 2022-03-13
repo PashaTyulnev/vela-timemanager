@@ -83,3 +83,59 @@ body{
 .error{
     color: #8f4a57;
 }
+.btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+.spinner-border{
+    width: 10rem;
+    height: 10rem;
+    margin:auto;
+    color:#7B927D;
+}
+.checkInActionError p{
+    text-align: center;
+    font-size: 1.5em;
+}
+
+
+.pinNumbers {
+    margin: auto;
+}
+
+.pinNumbers svg {
+    width: 2.5vw;
+    height: 2.5vw;
+    transform: scale(1);
+    margin-bottom: 8px;
+}
+
+.pinNumbers td {
+    /*height: 50px!important;*/
+    /*width: 50px!important;*/
+    width: calc(100% / 3);
+    border-color: rgba(128, 128, 128, 0.06);
+    font-size: 3vw;
+    user-select: none;
+    transition: 0.4s;
+}
+
+.pinNumbers td:hover {
+    background: rgba(211, 211, 211, 0.37);
+}
+
+.pinEntered{
+    margin-bottom: 5vw;
+}
+.pinEntered td, tr {
+    border: none;
+}
+.pinEntered td{
+    user-select: none;
+    font-size: 3vw;
+    font-weight: 600;
+}
+.pinEntered td input{
+    width: 25%;
+    border:none;
+}

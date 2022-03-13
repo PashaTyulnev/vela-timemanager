@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <nav class="navbar text-center">
+        <span class="navbar-brand h1 m-auto" id="time">12:12</span>
+    </nav>
+
+    <div class="container employerContainer">
+        <div class="row">
+            <div class="m-auto text-center">
+                {# <p>Bitte gib deine 4-stellige Pin ein</p> #}
+
+                <table class="table pinEntered">
+                    <tr>
+                        <td><input id="digit1" type="text" value="-"></td>
+                        <td><input id="digit2" type="text" value="-"></td>
+                        <td><input id="digit3" type="text" value="-"></td>
+                        <td><input id="digit4" type="text" value="-"></td>
+
+                    </tr>
+                </table>
+
+                <table class="table table-bordered pinNumbers">
+                    <tr>
+                        <td id="num1" class="number">1</td>
+                        <td id="num2" class="number">2</td>
+                        <td id="num3" class="number">3</td>
+                    </tr>
+                    <tr>
+                        <td id="num4" class="number">4</td>
+                        <td id="num5" class="number">5</td>
+                        <td id="num6" class="number">6</td>
+                    </tr>
+                    <tr>
+                        <td id="num7" class="number">7</td>
+                        <td id="num8" class="number">8</td>
+                        <td id="num9" class="number">9</td>
+                    </tr>
+                    <tr>
+                        <td id="deleteNumber">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-arrow-left" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                            </svg>
+                        </td>
+                        <td id="num0" class="number">0</td>
+                        <td id="pinEnter">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-arrow-90deg-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M4.854 14.854a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V3.5A2.5 2.5 0 0 1 6.5 1h8a.5.5 0 0 1 0 1h-8A1.5 1.5 0 0 0 5 3.5v9.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4z"/>
+                            </svg>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end userCheckInWindow" tabindex="-1" id="userCheckInWindow" aria-labelledby="offcanvasRightLabel">
+
+    </div>
+{% endblock %}
