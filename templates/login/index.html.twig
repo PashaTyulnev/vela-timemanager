@@ -1,20 +1,17 @@
-{% extends 'base.html.twig' %}
+{% extends 'base-main.html.twig' %}
 
 {% block body %}
-    {% if error %}
-        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+
 
 
     <form action="{{ path('login') }}" method="post">
 
-        <section class="vh-100" style="background-color: #8F714F;">
+        <section class="vh-100" style="background-color: #242424;">
             <div class="container py-5 h-100">
                 <div class="row d-flex justify-content-center align-items-center h-100">
                     <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-                        <div class="card shadow-2-strong">
-                            <div class="card-body p-5 text-center">
-                                <img src="/assets/img/logo.png">
+                        <div class="card shadow-2-strong loginCard">
+                            <div class="card-body p-5 text-center loginContainer">
                                 <div class="form-outline mb-4">
                                     <input placeholder="Benutzername" type="text" id="username" name="_username" value="{{ last_username }}" class="form-control form-control-lg" />
                                 </div>
@@ -24,17 +21,21 @@
                                 </div>
 
                                 <!-- Checkbox -->
-                                <div class="form-check d-flex justify-content-start mb-4">
-                                    <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            value=""
-                                            id="form1Example3"
-                                    />
-                                    <label class="form-check-label" for="form1Example3"> Passwort merken </label>
-                                </div>
+{#                                <div class="form-check d-flex justify-content-start mb-4">#}
+{#                                    <input#}
+{#                                            class="form-check-input"#}
+{#                                            type="checkbox"#}
+{#                                            value=""#}
+{#                                            id="form1Example3"#}
+{#                                    />#}
+{#                                    <label class="form-check-label" for="form1Example3"> Passwort merken </label>#}
+{#                                </div>#}
 
-                                <button class="btn btn-primary btn-lg btn-block" type="submit">Einloggen</button>
+                                <button class="btn btn-lg btn-block loginButton" type="submit">Einloggen</button>
+
+                                {% if error %}
+                                    <div><p class="errorMessage">{{ error.messageKey|trans(error.messageData, 'security') }}</p></div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

@@ -1,13 +1,10 @@
 security:
-    role_hierarchy:
-        ROLE_BAR_MAIN: ROLE_BAR_MAIN
-        ROLE_ADMIN: ROLE_USER
 
     enable_authenticator_manager: true
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-        App\Entity\User:
+        App\Entity\CompanyMainUser:
             algorithm: auto
 
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
@@ -15,8 +12,8 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
             entity:
-                class: App\Entity\User
-                property: username
+                class: App\Entity\CompanyMainUser
+                property: email
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -27,7 +24,7 @@ security:
             form_login:
                 login_path: login
                 check_path: login
-                default_target_path: mainBar
+                default_target_path: entryRouter
             logout:
                 path: logout
             # activate different ways to authenticate

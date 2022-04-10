@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'base-main.html.twig' %}
 
 {% block body %}
     <nav class="navbar text-center">
@@ -12,10 +12,11 @@
 
                 <table class="table pinEntered">
                     <tr>
-                        <td><input id="digit1" type="text" value="-"></td>
-                        <td><input id="digit2" type="text" value="-"></td>
-                        <td><input id="digit3" type="text" value="-"></td>
-                        <td><input id="digit4" type="text" value="-"></td>
+                        <td>
+                            <input id="enteredPin"  readonly>
+                            <p class="pinHelper">Bitte gebe hier deine persönliche Nummer ein.</p>
+                            <p class="pinHelper currentObject">Objekt: {{ companyObject.name }}</p>
+                        </td>
 
                     </tr>
                 </table>

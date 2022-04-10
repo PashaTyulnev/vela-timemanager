@@ -1,0 +1,10 @@
+{% extends 'base-admin.html.twig' %}
+{% use "admin/menu.html.twig" with menu as base_menu%}
+
+{% block body %}
+
+    {% block sidebar %}
+        {{ block('base_menu') }}
+    {% endblock %}
+
+{% endblock %}

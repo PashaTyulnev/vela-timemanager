@@ -2,30 +2,30 @@
 
 namespace App\Repository;
 
-use App\Entity\AppSettings;
+use App\Entity\Company;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method AppSettings|null find($id, $lockMode = null, $lockVersion = null)
- * @method AppSettings|null findOneBy(array $criteria, array $orderBy = null)
- * @method AppSettings[]    findAll()
- * @method AppSettings[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Company|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Company|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Company[]    findAll()
+ * @method Company[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class AppSettingsRepository extends ServiceEntityRepository
+class CompanyRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, AppSettings::class);
+        parent::__construct($registry, Company::class);
     }
 
     /**
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function add(AppSettings $entity, bool $flush = true): void
+    public function add(Company $entity, bool $flush = true): void
     {
         $this->_em->persist($entity);
         if ($flush) {
@@ -37,7 +37,7 @@ class AppSettingsRepository extends ServiceEntityRepository
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function remove(AppSettings $entity, bool $flush = true): void
+    public function remove(Company $entity, bool $flush = true): void
     {
         $this->_em->remove($entity);
         if ($flush) {
@@ -46,15 +46,15 @@ class AppSettingsRepository extends ServiceEntityRepository
     }
 
     // /**
-    //  * @return AppSettings[] Returns an array of AppSettings objects
+    //  * @return Company[] Returns an array of Company objects
     //  */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
+            ->orderBy('c.id', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
@@ -63,10 +63,10 @@ class AppSettingsRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?AppSettings
+    public function findOneBySomeField($value): ?Company
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.exampleField = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()

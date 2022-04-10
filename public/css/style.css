@@ -1,106 +1,253 @@
-.card-body{
+:root {
+    --checkin-color: #7B927D;
+    --checkout-color: #916C79;
+    --pause-color: #6C7691;
+    --user-checkin-background-color: #151715;
+    --user-checkin-text-color:#cecece;
+    --user-checkin-error-color : #a26464;
+    --navbar-background-color : #151715;
+    --time-text-color : #b9b9b9;
+    --main-background-color: #151715;
+    --pin-helper-color:#cecece;
+    --pin-numbers-color:#cecece;
+    --entered-pin-color:#a4a4a4;
+    --login-button-background:#151715;
+    --login-button-text:#cecece;
+    --login-container-color:#1e1e1e;
+}
+
+.card-body {
     background: #f4ebe8;
 }
-body{
-    background-color: ivory;
+
+body {
+    background-color: var(--main-background-color);
     overflow-y: hidden; /* Hide vertical scrollbar */
     overflow-x: hidden; /* Hide horizontal scrollbar */
 }
-.navbar{
-    background-color: ivory;
+
+.navbar {
+    background-color: var(--navbar-background-color);
 }
-.employerBox{
+
+.employerBox {
     margin-bottom: 2em;
 }
-.employerContainer{
+.loginContainer{
+    background-color: var(--login-container-color);
+    margin:0;
+    padding: 10px!important;
+    padding-top:30px!important;
+}
+
+.currentObject{
+    font-size: 3vw;
+}
+.loginCard{
+    background-color: var(--login-container-color);
+}
+.employerContainer {
     margin-top: 2em;
     margin-bottom: 2em;
 }
-.card-title{
+
+.card-title {
     text-align: center;
 }
-.card{
-    width:100%!important;
-}
-.time{
-    text-align: center!important;
-}
-.offcanvas-end{
-    width: 100%!important;
+
+.pinHelper {
+    font-style: italic;
+    color: var(--pin-helper-color);
 }
 
-.userCheckInWindow{
-    background-color: #d2c595;
+.card {
+    width: 100% !important;
 }
-.checkin svg,.pause svg,.checkout svg{
+
+.time {
+    text-align: center !important;
+}
+
+.offcanvas-end {
+    width: 100% !important;
+}
+
+.userCheckInWindow {
+    background-color: var(--user-checkin-background-color);
+}
+
+.checkin svg, .pause svg, .checkout svg {
     transition: 0.5s;
 }
-.checkin svg{
-    color:#7B927D;
+
+.checkin svg {
+    color: var(--checkin-color);
 }
-.pause svg{
-    color:#6C7691;
+
+.actionHelper {
+    text-align: center;
+    font-size: 2vw;
+    font-style: italic;
+}
+
+.checkin .actionHelper {
+    color: var(--checkin-color);
+    text-align: left;
+}
+
+.pause .actionHelper {
+    color: var(--pause-color);
+    text-align: center;
+}
+
+.checkout .actionHelper {
+    color: var(--checkout-color);
+    text-align: right;
+}
+
+.pause svg {
+    color: var(--pause-color);
     transform: scale(0.85);
 }
-.checkout svg{
-    color:#916C79;
+
+.checkout svg {
+    color: var(--checkout-color);
 }
 
-.checkin svg:hover{
+.checkin svg:hover {
     transform: scale(0.9);
 }
-.pause svg:hover{
+
+.pause svg:hover {
     transform: scale(0.75);
 }
-.checkout svg:hover{
+
+.checkout svg:hover {
     transform: scale(0.9);
 }
 
-.exitCheckin{
-    width: 3rem;
-    color:#515151;
-    transition: 0.5s;
-}
-
-.exitCheckin:hover{
-    transform: scale(0.9);
-}
-.userTimeInfo{
-    margin-top: 4vh!important;
-    margin-bottom: 2vh;
-    padding: 10px;
-    border-radius: 20px;
-    background-color: #e7d9a6;
-}
-.checkinGreeting{
-    font-size: 4rem;
-    color: #515151;
-}
-.checkInSubInfo{
+.checkinGreeting {
+    font-size: 4vw;
+    margin-bottom: 0.5rem;
+    color: var(--user-checkin-text-color);
     font-style: italic;
-    color: #515151;
 }
-.error{
+
+.actionButtons {
+    margin-left: 200px;
+    margin-right: 200px;
+}
+
+.offcanvas-body {
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+@media only screen and (max-width: 700px) {
+    .checkinGreeting {
+        font-size: 6vw;
+        margin-bottom: 1rem;
+    }
+
+
+    .actionButtons {
+        margin-left: 20px;
+        margin-right: 20px;
+        margin-top: 50%;
+    }
+
+    .actionHelper {
+        font-size: 4vw;
+    }
+
+    .pinNumbers td {
+        font-size: 7vw !important;
+    }
+
+    .pinNumbers svg {
+        width: 7vw !important;
+        height: 7vw !important;
+    }
+
+    .pinNumbers {
+        position: fixed;
+        bottom: 50px;
+        left: 0px;
+    }
+
+    #enteredPin {
+        font-size: 7vw !important;
+        margin-top: 50vw;
+        color:var(--entered-pin-color);
+    }
+
+    #time {
+        font-size: 4vw;
+        color: var(--time-text-color);
+    }
+
+    .exitCheckin {
+        height: 10vw;
+        color: var(--user-checkin-text-color);
+        margin-top: 30px;
+    }
+    .checkInActionError p {
+        text-align: center;
+        font-size: 1em;
+        font-style: italic;
+
+        color: var(--user-checkin-error-color);
+    }
+    }
+
+
+.checkInSubInfo {
+    font-style: italic;
+    color: var(--user-checkin-text-color);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.error {
     color: #8f4a57;
+}
+.errorMessage{
+    color: #a81818;
+    margin-top:20px;
 }
 .btn:focus {
     outline: none;
     box-shadow: none;
 }
-.spinner-border{
+
+.spinner-border {
     width: 10rem;
     height: 10rem;
-    margin:auto;
-    color:#7B927D;
+    margin: auto;
+    color: #7B927D;
 }
-.checkInActionError p{
+
+.loadingMessage{
+    color:var(--user-checkin-text-color);
+}
+.checkInActionError{
+    margin-top: 20px;
+}
+.checkInActionError p {
     text-align: center;
-    font-size: 1.5em;
+    font-size: 1em;
+    font-style: italic;
+    color: var(--user-checkin-error-color);
 }
 
 
 .pinNumbers {
     margin: auto;
+    color:var(--pin-numbers-color);
+}
+
+#time {
+    color: var(--time-text-color);
 }
 
 .pinNumbers svg {
@@ -118,24 +265,34 @@ body{
     font-size: 3vw;
     user-select: none;
     transition: 0.4s;
+    border-style: unset !important;
 }
 
 .pinNumbers td:hover {
     background: rgba(211, 211, 211, 0.37);
 }
 
-.pinEntered{
+.pinEntered {
     margin-bottom: 5vw;
 }
+
 .pinEntered td, tr {
     border: none;
 }
-.pinEntered td{
+
+.pinEntered td {
     user-select: none;
     font-size: 3vw;
     font-weight: 600;
 }
-.pinEntered td input{
-    width: 25%;
-    border:none;
+
+.pinEntered td input {
+    width: 50%;
+    border: none;
+    background-color: transparent;
+    text-align: center;
+}
+.loginButton{
+    background-color: var(--login-button-background);
+    color: var(--login-button-text);
 }

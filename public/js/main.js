@@ -14,12 +14,12 @@ function enterPin() {
     $('.number').on("click", function () {
         let id = this.id
         let number = id.match(/\d+/)[0]
-        for (let i = 1; i < 5; i++) {
-            let digit= $('#digit' + i);
-            if (digit.val() === "-") {
-                digit.val(number)
-                break;
-            }
+        let alreadyEnteredNumbers = $("#enteredPin").val();
+        let sizeOfEnteredPin = alreadyEnteredNumbers.length;
+        if (sizeOfEnteredPin === 0) {
+            $("#enteredPin").val(number);
+        } else {
+            $("#enteredPin").val(alreadyEnteredNumbers + number);
         }
     })
 }
@@ -29,13 +29,8 @@ function enterPin() {
  */
 function flushPin(flushed = false) {
 
-    if (!flushed) {
-        for (let i = 1; i <= 4; i++) {
-            $('#digit' + i).val('-')
-        }
-    } else {
-        flushed
-    }
+
+    $('#enteredPin').val("")
     {
         let myOffcanvas = document.getElementById('offcanvasBottom')
         myOffcanvas.addEventListener('hidden.bs.offcanvas', function () {
@@ -48,31 +43,19 @@ function flushPin(flushed = false) {
 
 function authWithPin() {
     $('#pinEnter').on("click", function () {
-        let allDigitsSet = false;
-        for (let i = 1; i <= 4; i++) {
-            if ($('#digit' + i).val() !== '-') {
-                allDigitsSet = true;
-            } else {
-                allDigitsSet = false;
-            }
-        }
-
-        if (!allDigitsSet) {
-            $(".pinEntered").effect("shake");
-        } else {
 
             $.ajax({
                 url: '/openCheckinWindow',
                 data: {
-                    pin: $('#digit1').val()+$('#digit2').val()+$('#digit3').val()+$('#digit4').val(),
+                    pin: $('#enteredPin').val()
                 },
                 method: 'POST'
             }).then(function (response) {
 
-                try{
+                try {
                     let jsonData = $.parseJSON(response);
                     $(".pinEntered").effect("shake");
-                }catch (e){
+                } catch (e) {
                     //opens offcanvas
                     let myOffcanvas = $('#userCheckInWindow')
 
@@ -88,8 +71,6 @@ function authWithPin() {
                 }
 
             })
-        }
-
     })
 }
 
@@ -99,20 +80,16 @@ function authWithPin() {
  */
 function deleteNumber() {
     $('#deleteNumber').on("click", function () {
-
-        for (let i = 4; i > 0; i--) {
-            if ($('#digit' + i).val() !== "-") {
-                $('#digit' + i).val("-")
-                break;
-            }
-        }
+        let enteredPin = $("#enteredPin")
+        let newPin = enteredPin.val().slice(0, -1);
+        enteredPin.val(newPin);
     })
 }
 
 /**
- * Open Checkin Screen for specific Employer
+ * Open Checkin Screen for specific CompanyUser
  */
-function checkEmployer(){
+function checkEmployer() {
     $('.employer').on("click", function () {
 
         //TODO IDs to complicated ids
@@ -121,13 +98,13 @@ function checkEmployer(){
         $.ajax({
             url: '/openCheckinWindow',
             data: {
-                userID:userID
+                userID: userID
             },
             method: 'POST'
         }).then(function (response) {
 
             //opens offcanvas
-            let myOffcanvas =$('#userCheckInWindow')
+            let myOffcanvas = $('#userCheckInWindow')
 
             //puts checkin html into offcanvas
             myOffcanvas.html(response)
@@ -144,15 +121,15 @@ function checkEmployer(){
     })
 }
 
-function checkInAction(){
-    $(".checkInAction").submit(function(event){
+function checkInAction() {
+    $(".checkInAction").submit(function (event) {
         event.preventDefault()
         let path = $(this).attr('action');
-        let formData =$( this ).serializeArray()
+        let formData = $(this).serializeArray()
 
         $.ajax({
             url: path,
-            data:formData,
+            data: formData,
             method: 'POST'
         }).then(function (response) {
 
@@ -160,18 +137,18 @@ function checkInAction(){
             console.log(jsonData);
 
             // if there is an error, throw it as message, else redirect to loading screen
-            if(jsonData.error != null) {
+            if (jsonData.error != null) {
                 let errorMessage = jsonData.error;
                 $("#checkInActionError").html(errorMessage)
-                setTimeout(function (){
+                setTimeout(function () {
                     $("#checkInActionError").html("")
-                },5000)
+                }, 5000)
 
             } else if (jsonData.loadingMessage != null) {
                 $.ajax({
                     url: '/loading',
-                    data:{
-                        'loadingMessage' : jsonData.loadingMessage
+                    data: {
+                        'loadingMessage': jsonData.loadingMessage
                     },
                     method: 'POST'
                 }).then(function (response) {
@@ -184,7 +161,7 @@ function checkInAction(){
 
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     updateTime();
     setInterval(updateTime, 1000);
     checkEmployer();

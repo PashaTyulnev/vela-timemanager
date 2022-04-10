@@ -1,0 +1,21 @@
+
+
+    {% for timeEntry in timeEntries %}
+       <tr>
+
+           <td>{{ timeEntry['name'] }}</td>
+           <td>{{ timeEntry['start'] | date("d.m.Y H:i") }}</td>
+           <td>
+               {% if timeEntry['end'] is defined %}
+               {{ timeEntry['end'] | date("d.m.Y H:i") }}
+               {% else %}
+                   -
+               {% endif %}
+           </td>
+           <td>{% if timeEntry['sum'] is defined %}
+                   {{ timeEntry['sum'] | date("d.m.Y H:i") }}
+               {% else %}
+                   -
+               {% endif %}</td>
+       </tr>
+    {% endfor %}

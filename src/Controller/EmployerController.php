@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\CompanyService;
 use App\Service\EmployerService;
 use App\Service\SettingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -10,36 +11,38 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
- * @IsGranted("ROLE_BAR_MAIN")
+ * @IsGranted("ROLE_MAIN")
  */
 class EmployerController extends AbstractController
 {
     private EmployerService $employerService;
     /**
-     * @var \App\Entity\Employer[]
+     * @var \App\Entity\CompanyUser[]
      */
     private array $employers;
     private SettingService $settingService;
+    private CompanyService $companyService;
 
-    public function __construct(EmployerService $employerService, SettingService $settingService)
+    public function __construct(EmployerService $employerService, SettingService $settingService,CompanyService $companyService)
     {
 
         $this->employerService = $employerService;
         $this->employers = $this->employerService->getAllEmployers();
         $this->settingService = $settingService;
+        $this->companyService = $companyService;
     }
 
     #[Route('/', name: 'mainBar')]
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
+
         $authByPin = $this->settingService->authByPin();
 
         if ($authByPin == true) {
-            return $this->render('mainBarPage/authByPin.html.twig');
+            return $this->render('mainBarPage/authByPin.html.twig',['companyObject'=>$this->companyService->getCurrentObject()]);
         } else {
             return $this->render('mainBarPage/employerList.html.twig', ['employers' => $this->employers]);
         }
-
     }
 
 
@@ -60,7 +63,7 @@ class EmployerController extends AbstractController
                 $userID = str_replace('user', '', $userID);
                 $employer = $this->employerService->getEmployerById($userID);
             } else {
-                $error = "Benutzer wurde manipuliert. Starte bitte die Seite neu und führe den Checkin Vorgang erneut auf.";
+                $error = "Benutzer wurde manipuliert. Starte bitte die Seite neu und führe den Checkin Vorgang erneut aus.";
             }
         }
         if($employer === null){
@@ -68,8 +71,9 @@ class EmployerController extends AbstractController
         }
         else{
             $workStart = $this->employerService->getEmployerWorkStartToday($employer);
+
             if ($workStart !== null) {
-                $workStart = $workStart->format('G:i');
+                $workStart = $workStart->format('m.d.Y G:i');
             }
             return $this->render('mainBarPage/checkEmployer.html.twig', [
                 'employer' => $employer,

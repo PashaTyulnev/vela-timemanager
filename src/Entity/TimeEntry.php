@@ -19,9 +19,18 @@ class TimeEntry
     #[ORM\ManyToOne(targetEntity: TimeEntryType::class, inversedBy: 'timeEntries')]
     private $timeEntryType;
 
-    #[ORM\ManyToOne(targetEntity: Employer::class, inversedBy: 'timeEntries')]
+    #[ORM\ManyToOne(targetEntity: CompanyUser::class, inversedBy: 'timeEntries')]
     #[ORM\JoinColumn(nullable: false)]
     private $employer;
+
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private $autoCheckOut;
+
+    #[ORM\ManyToOne(targetEntity: CompanyObject::class, inversedBy: 'timeEntries')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $object;
+
 
     public function getId(): ?int
     {
@@ -52,15 +61,40 @@ class TimeEntry
         return $this;
     }
 
-    public function getEmployer(): ?Employer
+    public function getEmployer(): ?CompanyUser
     {
         return $this->employer;
     }
 
-    public function setEmployer(?Employer $employer): self
+    public function setEmployer(?CompanyUser $employer): self
     {
         $this->employer = $employer;
 
         return $this;
     }
+
+    public function getAutoCheckOut(): ?bool
+    {
+        return $this->autoCheckOut;
+    }
+
+    public function setAutoCheckOut(?bool $autoCheckOut): self
+    {
+        $this->autoCheckOut = $autoCheckOut;
+
+        return $this;
+    }
+
+    public function getObject(): ?CompanyObject
+    {
+        return $this->object;
+    }
+
+    public function setObject(?CompanyObject $object): self
+    {
+        $this->object = $object;
+
+        return $this;
+    }
+
 }

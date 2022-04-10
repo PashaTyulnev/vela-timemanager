@@ -2,8 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\CompanyAppSettings;
 use App\Entity\TimeEntry;
-use App\Repository\EmployerRepository;
+use App\Repository\CompanyAppSettingsRepository;
+use App\Repository\CompanyUserRepository;
 use App\Repository\TimeEntryRepository;
 use App\Repository\TimeEntryTypeRepository;
 use DateTimeImmutable;
@@ -13,19 +15,23 @@ use JetBrains\PhpStorm\ArrayShape;
 class EmployerService
 {
 
-    private EmployerRepository $employerRepository;
+    private CompanyUserRepository $employerRepository;
     private TimeEntryTypeRepository $timeEntryTypeRepository;
     private EntityManagerInterface $entityManager;
-    private $checkInType;
-    private $employerId;
+    private int $employerId;
     private TimeEntryRepository $timeEntryRepository;
     private ?\App\Entity\TimeEntryType $timeEntryType;
     private DateTimeImmutable $date;
+    private CompanyService $companyService;
+    private CompanyAppSettingsRepository $companyAppSettingsRepository;
 
-    public function __construct(EmployerRepository      $employerRepository,
-                                TimeEntryTypeRepository $timeEntryTypeRepository,
-                                EntityManagerInterface  $entityManager,
-                                TimeEntryRepository     $timeEntryRepository
+
+    public function __construct(CompanyUserRepository        $employerRepository,
+                                TimeEntryTypeRepository      $timeEntryTypeRepository,
+                                EntityManagerInterface       $entityManager,
+                                TimeEntryRepository          $timeEntryRepository,
+                                CompanyService               $companyService,
+                                CompanyAppSettingsRepository $companyAppSettingsRepository,
     )
     {
 
@@ -33,8 +39,11 @@ class EmployerService
         $this->timeEntryTypeRepository = $timeEntryTypeRepository;
         $this->entityManager = $entityManager;
         $this->timeEntryRepository = $timeEntryRepository;
+        $this->companyService = $companyService;
+
         //define now time for compare
         $this->date = new DateTimeImmutable();
+        $this->companyAppSettingsRepository = $companyAppSettingsRepository;
 
     }
 
@@ -47,10 +56,12 @@ class EmployerService
     {
         return $this->employerRepository->findOneBy(['id' => $id]);
     }
+
     public function getEmployerByPin($pin)
     {
         return $this->employerRepository->findOneBy(['pin' => $pin]);
     }
+
     /**
      * @param $employer
      * @return DateTimeImmutable|null
@@ -62,18 +73,20 @@ class EmployerService
 
         $todayRangeHours = 12;
         $lastCheckinOfEmployer = $this->getLastCheckinOfEmployer($employer);
-        if($lastCheckinOfEmployer === null){
+//        $lastCheckoutOfEmployer = $this->getLastCheckinOfEmployer($employer,'checkout');
+
+        if ($lastCheckinOfEmployer === null) {
             return null;
-        }
-        else{
+        } else {
             //define what is "today", if in range of "today"
-            if($this->timeDiffInMinutes($this->date->getTimestamp(),$lastCheckinOfEmployer->getTimestamp()) < $todayRangeHours*60){
+            if ($this->timeDiffInMinutes($this->date->getTimestamp(), $lastCheckinOfEmployer->getTimestamp()) < $todayRangeHours * 60) {
                 return $lastCheckinOfEmployer;
             }
         }
 
         return null;
     }
+
 
     /**
      * @param $id
@@ -83,7 +96,7 @@ class EmployerService
      * Check in, check out oder Pause
      * @throws \Exception
      */
-    public function userCheckAction($id, $checkInType)
+    public function userCheckAction($id, $checkInType,$autoCheckoutTime = 0)
     {
 
         $this->timeEntryType = $this->getTimeEntryTypeByName($checkInType);
@@ -93,12 +106,20 @@ class EmployerService
         $this->employerId = $id;
         $this->checkInType = $checkInType;
 
-        //check if this action is valid
-        $this->checkIfActionAllowed();
+        if($autoCheckoutTime === 0){
+            //check if this action is valid
+            $this->checkIfActionAllowed();
+        }
 
         $timeEntry->setEmployer($this->getEmployerById($id));
         $timeEntry->setTimeEntryType($this->timeEntryType);
-        $timeEntry->setCreatedAt($this->date);
+
+        if($autoCheckoutTime !== 0){
+            $timeEntry->setCreatedAt($autoCheckoutTime);
+        }else{
+            $timeEntry->setCreatedAt($this->date);
+        }
+        $timeEntry->setObject($this->companyService->getCurrentObject());
         $this->entityManager->persist($timeEntry);
         $this->entityManager->flush();
 
@@ -143,34 +164,55 @@ class EmployerService
 
         //if just checked in
         $lastCheckInTime = $this->getLastCheckinOfEmployer($this->employerId);
-        if ($this->timeEntryType->getName() === "checkout" && ($this->timeDiffInMinutes($this->date->getTimestamp(),$lastCheckInTime->getTimestamp()) < $minMinutesShouldPass)) {
-            throw new \Exception("Du hast dich gerade erst eingecheckt. Bitte warte wenigstens ". $minMinutesShouldPass . " Minute(n)");
+        if ($this->timeEntryType->getName() === "checkout" && ($this->timeDiffInMinutes($this->date->getTimestamp(), $lastCheckInTime->getTimestamp()) < $minMinutesShouldPass)) {
+            throw new \Exception("Du hast dich gerade erst eingecheckt. Bitte warte wenigstens " . $minMinutesShouldPass . " Minute(n)");
         }
 
         //if pause without checkin
-        if($this->timeEntryType->getName() === "pause" && $lastTimeEntryOfEmployer->getTimeEntryType()->getName() !== "checkin"){
-            throw new \Exception("Du musst dich zuerst einchecken");
+        if ($this->timeEntryType->getName() === "pause" && $lastTimeEntryOfEmployer->getTimeEntryType()->getName() !== "checkin") {
+            throw new \Exception("Du musst dich zuerst einchecken Code:1");
         }
 
         //if checkout without checkin
-        if($this->timeEntryType->getName() === "checkout" && $lastTimeEntryOfEmployer->getTimeEntryType()->getName() !== "checkin"){
-            throw new \Exception("Du musst dich zuerst einchecken");
+        if ($this->timeEntryType->getName() === "checkout" && $lastTimeEntryOfEmployer->getTimeEntryType()->getName() !== "checkin") {
+            throw new \Exception("Du musst dich zuerst einchecken Code:2");
         }
 
         //if checkin after checkin
-        if($this->timeEntryType->getName() === "checkin" && $lastTimeEntryOfEmployer->getTimeEntryType()->getName() === "checkin"){
-            throw new \Exception("Du musst dich zuerst einchecken");
+        if ($this->timeEntryType->getName() === "checkin" && $lastTimeEntryOfEmployer->getTimeEntryType()->getName() === "checkin") {
+
+            $appSettings = $this->companyAppSettingsRepository->findOneBy(['company'=>$this->companyService->getCurrentCompany()]);
+
+            //check how much time passed since last checkin
+            $lastCheckinOfEmployer = $lastTimeEntryOfEmployer->getCreatedAt();
+
+            $hoursSinceLastCheckin = $this->timeDiffInMinutes($this->date->getTimestamp(), $lastCheckinOfEmployer->getTimestamp()) / 60;
+
+            if($this->appSettings->getAutoCheckoutAfterHours() <= $hoursSinceLastCheckin){
+
+                $autoHours = $appSettings->getAutoCheckoutGiveHours() * 60 * 60;
+                $newCheckoutTime = $lastCheckinOfEmployer->getTimestamp() + $autoHours;
+                $checkOutDateTime = date('Y-m-d H:i:s',$newCheckoutTime);
+                $checkOutDateTime = DateTimeImmutable::createFromFormat('Y-m-d H:i:s',$checkOutDateTime);
+
+                $this->userCheckAction($this->employerId,"checkout",$checkOutDateTime);
+            }
+            throw new \Exception("Du bist schon eingecheckt.");
         }
 
-        if($this->timeEntryType->getName() === "checkout" && $lastTimeEntryOfEmployer->getTimeEntryType()->getName() === "checkin"){
+        if ($this->timeEntryType->getName() === "checkout" && $lastTimeEntryOfEmployer->getTimeEntryType()->getName() === "checkin") {
             return true;
         }
+
+        if ($this->timeEntryType->getName() === "pause" && $lastTimeEntryOfEmployer->getTimeEntryType()->getName() === "checkin") {
+            return true;
+        }
+
 
         $lastTimeEntryOfEmployerSameTypeCreated = $lastTimeEntryOfEmployerSameType->getCreatedAt();
 
         //check time since last same action minutes
         $lastSameActionTimeGone = abs($this->date->getTimestamp() - $lastTimeEntryOfEmployerSameTypeCreated->getTimestamp()) / 60;
-
 
 
         //if less than 1 minute of same action
@@ -192,24 +234,22 @@ class EmployerService
 
     }
 
-    private function getLastCheckinOfEmployer($employer): ?DateTimeImmutable
+    private function getLastCheckinOfEmployer($employer, $type = "checkin"): ?DateTimeImmutable
     {
-        $checkInType = $this->timeEntryTypeRepository->findOneBy(['name'=>'checkin']);
-        $lastCheckInOfUser = $this->timeEntryRepository->findOneBy(['timeEntryType'=>$checkInType,'employer'=>$employer],['createdAt' => 'desc']);
+        $checkInType = $this->timeEntryTypeRepository->findOneBy(['name' => $type]);
+        $lastCheckInOfUser = $this->timeEntryRepository->findOneBy(['timeEntryType' => $checkInType, 'employer' => $employer], ['createdAt' => 'desc']);
 
-        if($lastCheckInOfUser === null){
+        if ($lastCheckInOfUser === null) {
             return null;
-        }
-        else{
+        } else {
             return $lastCheckInOfUser->getCreatedAt();
         }
 
     }
 
-    private function timeDiffInMinutes($date1,$date2): float|int
+    public function timeDiffInMinutes($date1, $date2): float|int
     {
         return abs($date1 - $date2) / 60;
     }
-
 
 }

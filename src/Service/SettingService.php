@@ -2,13 +2,13 @@
 
 namespace App\Service;
 
-use App\Repository\AppSettingsRepository;
+use App\Repository\CompanyAppSettingsRepository;
 
 class SettingService
 {
-    private AppSettingsRepository $appSettingsRepository;
+    private CompanyAppSettingsRepository $appSettingsRepository;
 
-    public function __construct(AppSettingsRepository $appSettingsRepository){
+    public function __construct(CompanyAppSettingsRepository $appSettingsRepository){
 
         $this->appSettingsRepository = $appSettingsRepository;
     }

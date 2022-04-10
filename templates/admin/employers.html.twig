@@ -1,0 +1,36 @@
+{% extends 'base-admin.html.twig' %}
+{% use "admin/menu.html.twig" with menu as base_menu %}
+
+{% block body %}
+
+    {% block sidebar %}
+        {{ block('base_menu') }}
+    {% endblock %}
+
+    {% block main_content %}
+        <div class="mainContent">
+            <h2>Mitarbeiter</h2>
+
+            <table id="employers">
+                <thead>
+                <tr>
+                    <td>Nachname</td>
+                    <td>Vorname</td>
+                    <td>Nummer</td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for employer in allEmployers %}
+                    <tr>
+                        <td>{{ employer.lastName }}</td>
+                        <td>{{ employer.firstName }}</td>
+                        <td>{{ employer.pin }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <script src="{{ asset("js/employers.js") }}" ></script>
+    {% endblock %}
+{% endblock %}

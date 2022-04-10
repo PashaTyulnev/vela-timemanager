@@ -2,13 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\EmployerRepository;
+use App\Repository\CompanyUserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: EmployerRepository::class)]
-class Employer
+#[ORM\Entity(repositoryClass: CompanyUserRepository::class)]
+class CompanyUser
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -26,6 +26,10 @@ class Employer
 
     #[ORM\OneToMany(mappedBy: 'employer', targetEntity: TimeEntry::class)]
     private $timeEntries;
+
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'companyUsers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $company;
 
 
     public function __construct()
@@ -100,6 +104,18 @@ class Employer
                 $timeEntry->setEmployer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCompany(): ?company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?company $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

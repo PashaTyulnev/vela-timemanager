@@ -2,30 +2,30 @@
 
 namespace App\Repository;
 
-use App\Entity\Employer;
+use App\Entity\CompanyObject;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Employer|null find($id, $lockMode = null, $lockVersion = null)
- * @method Employer|null findOneBy(array $criteria, array $orderBy = null)
- * @method Employer[]    findAll()
- * @method Employer[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method CompanyObject|null find($id, $lockMode = null, $lockVersion = null)
+ * @method CompanyObject|null findOneBy(array $criteria, array $orderBy = null)
+ * @method CompanyObject[]    findAll()
+ * @method CompanyObject[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class EmployerRepository extends ServiceEntityRepository
+class CompanyObjectRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Employer::class);
+        parent::__construct($registry, CompanyObject::class);
     }
 
     /**
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function add(Employer $entity, bool $flush = true): void
+    public function add(CompanyObject $entity, bool $flush = true): void
     {
         $this->_em->persist($entity);
         if ($flush) {
@@ -37,7 +37,7 @@ class EmployerRepository extends ServiceEntityRepository
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function remove(Employer $entity, bool $flush = true): void
+    public function remove(CompanyObject $entity, bool $flush = true): void
     {
         $this->_em->remove($entity);
         if ($flush) {
@@ -46,15 +46,15 @@ class EmployerRepository extends ServiceEntityRepository
     }
 
     // /**
-    //  * @return Employer[] Returns an array of Employer objects
+    //  * @return CompanyObject[] Returns an array of CompanyObject objects
     //  */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
+            ->orderBy('c.id', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
@@ -63,10 +63,10 @@ class EmployerRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Employer
+    public function findOneBySomeField($value): ?CompanyObject
     {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.exampleField = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()

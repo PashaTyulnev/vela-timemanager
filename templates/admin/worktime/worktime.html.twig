@@ -1,0 +1,46 @@
+{% extends 'base-admin.html.twig' %}
+{% use "admin/menu.html.twig" with menu as base_menu %}
+
+{% block body %}
+
+    {% block sidebar %}
+        {{ block('base_menu') }}
+    {% endblock %}
+
+    {% block main_content %}
+        <div class="mainContent">
+            <h2>Arbeitszeiten</h2>
+            <div class="row">
+                <div class="col-12 col-lg-2">
+                    <select class="form-select" aria-label="Default select example">
+                        <option value="0">Objekt auswählen</option>
+                        {% for object in allObjects %}
+                            <option class="companyObject" value="{{ object.id }}">{{ object.name }}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+                <div class="col-12 col-lg-10">
+                    <table id="worktime">
+                        <thead>
+                        <tr>
+                            <td>Arbeiter</td>
+                            <td>Beginn</td>
+                            <td>Ende</td>
+                            <td>Gesamt</td>
+                        </tr>
+                        </thead>
+                        <tbody id="worktimeContent">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+        </div>
+
+        <script src="{{ asset("js/worktime.js") }}" ></script>
+    {% endblock %}
+{% endblock %}
