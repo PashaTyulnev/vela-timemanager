@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Repository\CompanyObjectRepository;
+use DateInterval;
+use DateTimeImmutable;
 
 class WorktimeService
 {
@@ -64,13 +66,17 @@ class WorktimeService
                        $formatArray[$bufferItem[$employerId]]['end'] = $timeEntryDateTime;
 
                         //total time
-                       $timeDifference = abs(  $formatArray[$bufferItem[$employerId]]['start']->getTimestamp() -  $formatArray[$bufferItem[$employerId]]['end']->getTimestamp())/3600;
-                       $hours = floor($timeDifference);
-                       $minutes = ceil($timeDifference)-$timeDifference;
-                       $minutes = $minutes * 60;
-                       if(strlen($minutes) === 1)
-                           $minutes = '0'.$minutes;
-                       $formatArray[$bufferItem[$employerId]]['sum'] = $hours.":".$minutes ;
+                       $timeDifference =  $formatArray[$bufferItem[$employerId]]['start']->diff( $formatArray[$bufferItem[$employerId]]['end']);
+
+                       $totalHours = $this->getTotalHours($timeDifference);
+                       $fullHours = floor($totalHours);
+
+                       $totalMinutes = $this->getTotalMinutes($timeDifference);
+                       $leftMinutes = $totalMinutes-$fullHours*60;
+                       if(strlen($leftMinutes) === 1){
+                           $leftMinutes = "0".$leftMinutes;
+                       }
+                       $formatArray[$bufferItem[$employerId]]['sum'] = $fullHours. ":". $leftMinutes ;
 
                        if($autoCheckout !== null){
                            $formatArray[$timeEntryIndex]['autoCheckout'] = true;
@@ -82,6 +88,15 @@ class WorktimeService
 
         }
         return $formatArray;
+    }
+    function getTotalMinutes(DateInterval $int): float|int
+    {
+        return ($int->d * 24 * 60) + ($int->h * 60) + $int->i;
+    }
+
+    function getTotalHours(DateInterval $int): float|int
+    {
+        return ($int->d * 24) + $int->h + $int->i / 60;
     }
 
 }
