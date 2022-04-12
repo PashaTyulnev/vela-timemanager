@@ -27,7 +27,12 @@ class CompanyService
 
     public function getCurrentCompany(){
         $user = $this->security->getUser();
-        return $user->getCompany();
+        if($user->getCompany() === null){
+            return $user->getCompanyObject()->getCompany();
+        }else{
+            return $user->getCompany();
+        }
+
     }
 
     public function getCompanyObjects(){

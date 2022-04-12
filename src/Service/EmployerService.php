@@ -183,12 +183,13 @@ class EmployerService
 
             $appSettings = $this->companyAppSettingsRepository->findOneBy(['company'=>$this->companyService->getCurrentCompany()]);
 
+
             //check how much time passed since last checkin
             $lastCheckinOfEmployer = $lastTimeEntryOfEmployer->getCreatedAt();
 
             $hoursSinceLastCheckin = $this->timeDiffInMinutes($this->date->getTimestamp(), $lastCheckinOfEmployer->getTimestamp()) / 60;
 
-            if($this->appSettings->getAutoCheckoutAfterHours() <= $hoursSinceLastCheckin){
+            if($appSettings->getAutoCheckoutAfterHours() <= $hoursSinceLastCheckin){
 
                 $autoHours = $appSettings->getAutoCheckoutGiveHours() * 60 * 60;
                 $newCheckoutTime = $lastCheckinOfEmployer->getTimestamp() + $autoHours;
