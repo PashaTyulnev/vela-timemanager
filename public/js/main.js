@@ -1,5 +1,5 @@
 var serverTime = new Date();
-
+document.body.requestFullscreen();
 function updateTime() {
     /// Increment serverTime by 1 second and update the html for '#time'
     serverTime = new Date(serverTime.getTime() + 1000);
