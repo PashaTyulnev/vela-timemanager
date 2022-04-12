@@ -63,11 +63,9 @@ class WorktimeService
                    if($employerId === key($bufferItem)){
                        $formatArray[$bufferItem[$employerId]]['end'] = $timeEntryDateTime;
 
-
+                        //total time
                        $timeDifference = abs(  $formatArray[$bufferItem[$employerId]]['start']->getTimestamp() -  $formatArray[$bufferItem[$employerId]]['end']->getTimestamp()) / 60;
 
-                       $formatArray[$bufferItem[$employerId]]['start'] = $formatArray[$bufferItem[$employerId]]['start'];
-                       $formatArray[$bufferItem[$employerId]]['end'] = $formatArray[$bufferItem[$employerId]]['end'];
                        $formatArray[$bufferItem[$employerId]]['sum'] = date('H:i', $timeDifference*60) ;
 
                        if($autoCheckout !== null){
