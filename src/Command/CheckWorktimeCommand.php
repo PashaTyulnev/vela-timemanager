@@ -64,7 +64,14 @@ class CheckWorktimeCommand extends Command
         foreach ($allUsers as $employer) {
             $lastMainCheckin = $this->employerService->getLastMainCheckin($employer);
             $lastTimeEntry = $this->employerService->getLastTimeEntryOfEmployer($employer);
+
+            $io->comment("-------------------");
+            $io->comment("CHECK USER ". $employer->getFirstName() . " ". $employer->getLastName());
+
             if ($lastMainCheckin != null) {
+
+                $io->comment("LAST MAIN CHECKIN: " . $lastMainCheckin->getCreatedAt()->format("d.m.Y h:i"));
+                $io->comment("LAST TIME ENTRY: " . $lastTimeEntry->getCreatedAt()->format("d.m.Y h:i"));
 
                 if ($lastTimeEntry->getTimeEntryType()->getName() !== 'checkout') {
 
@@ -75,13 +82,15 @@ class CheckWorktimeCommand extends Command
                     $company = $employer->getCompany();
                     $companySettings = $this->companyAppSettingsRepository->findOneBy(['company' => $company]);
                     $minutesInWorkday = $companySettings->getHoursBetweenShifts() * 60;
+                    //Time since unchecked out time entry
                     $timeDiffMinutes = $timeNow->getTimestamp() - $timeLastCheckin->getTimestamp();
-
                     $autoCheckoutGiveMinutes = $companySettings->getAutoCheckoutGiveHours() * 60;
-
                     $object = $lastTimeEntry->getObject();
-
                     $checkOutTypeObject = $this->employerService->getTimeEntryTypeByName('checkout');
+
+                    $io->comment("TIME DIFF: " . $timeDiffMinutes);
+                    $io->comment("MINUTES IN WORKDAY: " . $minutesInWorkday);
+
                     if ($timeDiffMinutes >= $minutesInWorkday) {
 
                         $newCheckoutTime = $timeLastCheckin->getTimestamp() + $autoCheckoutGiveMinutes * 60;
@@ -106,7 +115,7 @@ class CheckWorktimeCommand extends Command
         }
 
 
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $io->success('Command erfolgreich beendet.');
 
         return Command::SUCCESS;
     }
