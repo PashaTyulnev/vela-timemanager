@@ -83,7 +83,7 @@ class CheckWorktimeCommand extends Command
                     $companySettings = $this->companyAppSettingsRepository->findOneBy(['company' => $company]);
                     $minutesInWorkday = $companySettings->getHoursBetweenShifts() * 60;
                     //Time since unchecked out time entry
-                    $timeDiffMinutes = $timeNow->getTimestamp() - $timeLastCheckin->getTimestamp();
+                    $timeDiffMinutes = ($timeNow->getTimestamp() - $timeLastCheckin->getTimestamp())/60;
                     $autoCheckoutGiveMinutes = $companySettings->getAutoCheckoutGiveHours() * 60;
                     $object = $lastTimeEntry->getObject();
                     $checkOutTypeObject = $this->employerService->getTimeEntryTypeByName('checkout');
