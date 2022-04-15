@@ -19,8 +19,8 @@
         <div class="row align-middle actionButtons">
             <h1 class="text-center mt-3 checkinGreeting">Hallo, {{ employer.firstname }}</h1>
 
-            {% if workStartToday is not null %}
-                <p class="checkInSubInfo">Letzter Checkin {{ workStartToday }}. </p>
+            {% if status is not null %}
+                <p class="checkInSubInfo">{{status}} </p>
             {% endif %}
 
             <div class="col checkin">

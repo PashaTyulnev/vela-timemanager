@@ -31,6 +31,9 @@ class TimeEntry
     #[ORM\JoinColumn(nullable: false)]
     private $object;
 
+    #[ORM\Column(type: 'boolean')]
+    private $mainCheckin;
+
 
     public function getId(): ?int
     {
@@ -93,6 +96,18 @@ class TimeEntry
     public function setObject(?CompanyObject $object): self
     {
         $this->object = $object;
+
+        return $this;
+    }
+
+    public function getMainCheckin(): ?bool
+    {
+        return $this->mainCheckin;
+    }
+
+    public function setMainCheckin(bool $mainCheckin): self
+    {
+        $this->mainCheckin = $mainCheckin;
 
         return $this;
     }

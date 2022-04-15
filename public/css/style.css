@@ -249,7 +249,9 @@ body {
 #time {
     color: var(--time-text-color);
 }
-
+.remember{
+    color: var(--login-button-text);
+}
 .pinNumbers svg {
     width: 2.5vw;
     height: 2.5vw;

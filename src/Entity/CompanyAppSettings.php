@@ -26,6 +26,9 @@ class CompanyAppSettings
     #[ORM\Column(type: 'integer')]
     private $autoCheckoutGiveHours;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $hoursBetweenShifts;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class CompanyAppSettings
     public function setAutoCheckoutGiveHours(int $autoCheckoutGiveHours): self
     {
         $this->autoCheckoutGiveHours = $autoCheckoutGiveHours;
+
+        return $this;
+    }
+
+    public function getHoursBetweenShifts(): ?int
+    {
+        return $this->hoursBetweenShifts;
+    }
+
+    public function setHoursBetweenShifts(?int $hoursBetweenShifts): self
+    {
+        $this->hoursBetweenShifts = $hoursBetweenShifts;
 
         return $this;
     }

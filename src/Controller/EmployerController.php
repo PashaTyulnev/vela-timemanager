@@ -70,14 +70,11 @@ class EmployerController extends AbstractController
            $error = "Es wurde kein Mitarbeiter gefunden";
         }
         else{
-            $workStart = $this->employerService->getEmployerWorkStartToday($employer);
+            $status = $this->employerService->getEmployerStatusString($employer);
 
-            if ($workStart !== null) {
-                $workStart = $workStart->format('m.d.Y G:i');
-            }
             return $this->render('mainBarPage/checkEmployer.html.twig', [
                 'employer' => $employer,
-                'workStartToday' => $workStart
+                'status' => $status
             ]);
         }
 
