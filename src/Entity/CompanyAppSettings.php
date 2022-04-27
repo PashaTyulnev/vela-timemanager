@@ -29,6 +29,9 @@ class CompanyAppSettings
     #[ORM\Column(type: 'integer', nullable: true)]
     private $hoursBetweenShifts;
 
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private $allowPause;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +93,18 @@ class CompanyAppSettings
     public function setHoursBetweenShifts(?int $hoursBetweenShifts): self
     {
         $this->hoursBetweenShifts = $hoursBetweenShifts;
+
+        return $this;
+    }
+
+    public function getAllowPause(): ?bool
+    {
+        return $this->allowPause;
+    }
+
+    public function setAllowPause(?bool $allowPause): self
+    {
+        $this->allowPause = $allowPause;
 
         return $this;
     }

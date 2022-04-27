@@ -1,21 +1,56 @@
+<form method="post" action="/export-pdf">
+    <div class="row exportContainer">
+        <div class="col-auto">
+            <select class="form-select" aria-label="Default select example" name="month">
+                <option value="1" selected>Januar</option>
+                <option value="2">Februar</option>
+                <option value="3">März</option>
+                <option value="4">April</option>
+            </select>
+        </div>
 
-
+        <div class="col-auto">
+            <button type="submit" class="btn btn-danger" id="exportPdf">
+                <i class="bi bi-filetype-pdf"></i> Export PDF
+            </button>
+        </div>
+    </div>
+    <input type="hidden" name="objectId" value="{{objectId}}">
+</form>
+<table id="worktime">
+    <thead>
+    <tr>
+        <td>Arbeiter</td>
+        <td>Beginn</td>
+        <td>Ende</td>
+        <td>Gesamt</td>
+    </tr>
+    </thead>
+    <tbody id="worktimeContent">
     {% for timeEntry in timeEntries %}
-       <tr>
+        <tr>
 
-           <td>{{ timeEntry['name'] }}</td>
-           <td>{{ timeEntry['start'] | date("d.m.Y H:i") }}</td>
-           <td>
-               {% if timeEntry['end'] is defined %}
-               {{ timeEntry['end'] | date("d.m.Y H:i") }}
-               {% else %}
-                   -
-               {% endif %}
-           </td>
-           <td>{% if timeEntry['sum'] is defined %}
-                   {{ timeEntry['sum']}}
-               {% else %}
-                   -
-               {% endif %}</td>
-       </tr>
+            <td>{{ timeEntry['name'] }}</td>
+            <td>{{ timeEntry['start'] | date("d.m.Y H:i") }}</td>
+            <td>
+                {% if timeEntry['end'] is defined %}
+                    {{ timeEntry['end'] | date("d.m.Y H:i") }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>{% if timeEntry['sum'] is defined %}
+                    {{ timeEntry['sum'] }}
+                {% else %}
+                    -
+                {% endif %}</td>
+        </tr>
     {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    destroyWorktimeTable();
+    createWorktimeTable();
+    exportFormAction();
+</script>

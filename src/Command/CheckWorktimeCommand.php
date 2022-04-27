@@ -70,14 +70,11 @@ class CheckWorktimeCommand extends Command
 
             if ($lastMainCheckin != null) {
 
-                $io->comment("LAST MAIN CHECKIN: " . $lastMainCheckin->getCreatedAt()->format("d.m.Y h:i"));
-                $io->comment("LAST TIME ENTRY: " . $lastTimeEntry->getCreatedAt()->format("d.m.Y h:i"));
-
                 if ($lastTimeEntry->getTimeEntryType()->getName() !== 'checkout') {
 
                     $tz = new DateTimeZone("Europe/Berlin");
-                    $timeNow = new DateTime($this->employerService->getNow()->format("Y-m-d h:i:s"), $tz);
-                    $timeLastCheckin = new DateTime($lastMainCheckin->getCreatedAt()->format("Y-m-d h:i:s"), $tz);
+                    $timeNow = new DateTime($this->employerService->getNow()->format("Y-m-d H:i:s"), $tz);
+                    $timeLastCheckin = new DateTime($lastMainCheckin->getCreatedAt()->format("Y-m-d H:i:s"), $tz);
 
                     $company = $employer->getCompany();
                     $companySettings = $this->companyAppSettingsRepository->findOneBy(['company' => $company]);
@@ -88,13 +85,15 @@ class CheckWorktimeCommand extends Command
                     $object = $lastTimeEntry->getObject();
                     $checkOutTypeObject = $this->employerService->getTimeEntryTypeByName('checkout');
 
-                    $io->comment("TIME DIFF: " . $timeDiffMinutes);
-                    $io->comment("MINUTES IN WORKDAY: " . $minutesInWorkday);
 
                     if ($timeDiffMinutes >= $minutesInWorkday) {
 
-                        $newCheckoutTime = $timeLastCheckin->getTimestamp() + $autoCheckoutGiveMinutes * 60;
-                        $newDateTime = new DateTimeImmutable('', new DateTimeZone('Europe/Berlin'));
+                        $newCheckoutTime = ($timeLastCheckin->getTimestamp()+7200) + $autoCheckoutGiveMinutes * 60;
+
+                        $newDateTime = (new \DateTimeImmutable())->setTimestamp($newCheckoutTime);
+
+                        $io->comment($newDateTime->format("d.m.Y H:i:s"));
+
                         $newDateTime->setTimestamp($newCheckoutTime);
                         $timeEntry = new TimeEntry();
                         $timeEntry->setTimeEntryType($checkOutTypeObject);

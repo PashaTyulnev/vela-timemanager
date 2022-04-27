@@ -1,0 +1,37 @@
+{% extends 'base-admin.html.twig' %}
+
+{% block body %}
+    <img style="width:100px;height: 100px;" src="data:image/png;base64,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">
+    <h2>{{objectName}}</h2>
+    <table style="width:100%;">
+        <thead style="border-bottom: black solid 1px;font-weight: bold;">
+        <tr>
+            <td>Arbeiter</td>
+            <td>Beginn</td>
+            <td>Ende</td>
+            <td>Gesamt</td>
+        </tr>
+        </thead>
+        <tbody id="worktimeContent">
+        {% for timeEntry in timeEntries %}
+            <tr>
+
+                <td>{{ timeEntry['name'] }}</td>
+                <td>{{ timeEntry['start'] | date("d.m.Y H:i") }}</td>
+                <td>
+                    {% if timeEntry['end'] is defined %}
+                        {{ timeEntry['end'] | date("d.m.Y H:i") }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{% if timeEntry['sum'] is defined %}
+                        {{ timeEntry['sum'] }}
+                    {% else %}
+                        -
+                    {% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{%endblock%}

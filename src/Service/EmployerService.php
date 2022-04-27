@@ -255,20 +255,29 @@ class EmployerService
     {
         $lastTimeEntry = $this->getLastTimeEntryOfEmployer($employer);
 
-        if ($lastTimeEntry->getTimeEntryType()->getName() === "checkin") {
-            $mainCheckin = $this->getLastMainCheckin($employer);
-            return "Du arbeitest seit " . $mainCheckin->getCreatedAt()->format("d.m.Y H:i");
+        if($lastTimeEntry != null){
+            if ($lastTimeEntry->getTimeEntryType()->getName() === "checkin") {
+                $mainCheckin = $this->getLastMainCheckin($employer);
+                if($mainCheckin != null){
+                    return "Du arbeitest seit " . $mainCheckin->getCreatedAt()->format("d.m.Y H:i");
+                }
+                else{
+                    return "Du arbeitest seit " . $lastTimeEntry->getCreatedAt()->format("d.m.Y H:i");
+                }
+
+            }
+            if ($lastTimeEntry->getTimeEntryType()->getName() === "checkout") {
+                return "Du hast Feierabend seit " . $lastTimeEntry->getCreatedAt()->format("d.m.Y H:i");
+            }
+            if ($lastTimeEntry->getTimeEntryType()->getName() === "pause") {
+                //if pause, look what was before pause
+                return "Du machst Pause seit " . $lastTimeEntry->getCreatedAt()->format("d.m.Y H:i");
+            }
         }
-        if ($lastTimeEntry->getTimeEntryType()->getName() === "checkout") {
-            return "Du hast Feierabend seit " . $lastTimeEntry->getCreatedAt()->format("d.m.Y H:i");
-        }
-        if ($lastTimeEntry->getTimeEntryType()->getName() === "pause") {
-            //if pause, look what was before pause
-            return "Du machst Pause seit " . $lastTimeEntry->getCreatedAt()->format("d.m.Y H:i");
-        } else {
+        else {
             return "Das ist deine erste Benutzung dieser App. Bitte check dich ein.";
         }
-
+        return "";
     }
 
     public function getLastMainCheckin($employer): ?TimeEntry

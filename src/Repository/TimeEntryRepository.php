@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\TimeEntry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -73,4 +74,19 @@ class TimeEntryRepository extends ServiceEntityRepository
         ;
     }
     */
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function findByDate($objectId, $from, $to)
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.object = :id')
+            ->setParameter('id', $objectId)
+            ->andWhere('t.createdAt >= :from')
+            ->setParameter('from', $from)
+            ->andWhere('t.createdAt <= :to')
+            ->setParameter('to', $to)
+            ->getQuery()
+            ->getResult();
+    }
 }
