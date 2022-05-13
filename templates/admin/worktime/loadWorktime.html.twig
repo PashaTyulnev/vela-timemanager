@@ -1,11 +1,11 @@
-<form method="post" action="/export-pdf">
+<form method="post" id="exportForm" action="/export-pdf">
     <div class="row exportContainer">
         <div class="col-auto">
-            <select class="form-select" aria-label="Default select example" name="month">
-                <option value="1" selected>Januar</option>
-                <option value="2">Februar</option>
-                <option value="3">März</option>
-                <option value="4">April</option>
+            <select class="form-select" aria-label="Default select example" name="datetime" >
+                {% for date in monthsOfSelect %}
+                    <option class="monthSelect" data-object="{{objectId}}"
+                            value="{{ date['year'] }}-{{ date['monthNumber'] }}" {% if date['monthNumber'] == monthNow and date['year'] == yearNow %} selected {% endif %}>{{ date['month'] }} {{ date['year'] }}</option>
+                {% endfor %}
             </select>
         </div>
 
@@ -15,7 +15,7 @@
             </button>
         </div>
     </div>
-    <input type="hidden" name="objectId" value="{{objectId}}">
+    <input type="hidden" name="objectId" value="{{ objectId }}">
 </form>
 <table id="worktime">
     <thead>
@@ -53,4 +53,5 @@
     destroyWorktimeTable();
     createWorktimeTable();
     exportFormAction();
+    activateListener();
 </script>

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\TimeEntry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -17,9 +18,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TimeEntryRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, TimeEntry::class);
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -89,4 +93,17 @@ class TimeEntryRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findMinDate($object)
+    {
+       $query=$this->entityManager->createQuery('SELECT MIN(t.createdAt) FROM App\Entity\TimeEntry t WHERE t.object='.$object);
+       return $query->getResult();
+    }
+
+    public function findMaxDate($object)
+    {
+        $query=$this->entityManager->createQuery('SELECT MAX(t.createdAt) FROM App\Entity\TimeEntry t WHERE t.object='.$object);
+        return $query->getResult();
+    }
+
 }

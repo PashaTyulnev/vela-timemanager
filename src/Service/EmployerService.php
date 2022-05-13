@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\CompanyAppSettings;
+use App\Entity\CompanyUser;
 use App\Entity\TimeEntry;
 use App\Repository\CompanyAppSettingsRepository;
 use App\Repository\CompanyUserRepository;
@@ -283,6 +284,82 @@ class EmployerService
     public function getLastMainCheckin($employer): ?TimeEntry
     {
         return $this->timeEntryRepository->findOneBy(['employer' => $employer, 'mainCheckin' => true], ['createdAt' => 'DESC']);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function createNewEmployer($request)
+    {
+        $currentCompany = $this->companyService->getCurrentCompany();
+        $newEmployer = new CompanyUser();
+
+        if(!$request->get('firstName')){
+            throw new \Exception("Bitte geben Sie einen Vornamen ein!");
+        }
+        if(!$request->get('lastName')){
+            throw new \Exception("Bitte geben Sie einen Nachnamen ein!");
+        }
+
+        $firstName = $request->get('firstName');
+        $lastName = $request->get('lastName');
+
+        //wenn pin automatisch generiert werden soll
+        if(!$request->get('pin')){
+           $pin = $this->createNewEmployerPin();
+        }else{
+            $pin = $request->get('pin');
+            $pinExists = $this->checkSamePin($pin);
+
+            if($pinExists){
+                throw new \Exception("Person mit dieser Pin ist bereits angelegt!");
+            }
+        }
+
+        $newEmployer->setCompany($currentCompany);
+        $newEmployer->setFirstName($firstName);
+        $newEmployer->setLastName($lastName);
+        $newEmployer->setPin($pin);
+        $this->entityManager->persist($newEmployer);
+        $this->entityManager->flush();
+
+        return [
+            'success' => "Arbeiter wurde erstellt!"
+        ];
+
+    }
+
+    public function createNewEmployerPin(): int
+    {
+
+        $currentCompany = $this->companyService->getCurrentCompany();
+
+        // 4 stellig
+        $pin = rand(1111,9888);
+
+        $pinExists = $this->checkSamePin($pin);
+
+        //wenn es niemanden mit dieser PIN in dieser Firma gibt dann kann man die nehmen
+        if(!$pinExists){
+            return $pin;
+        }else{
+           $this->createNewEmployerPin();
+        }
+        return 0;
+    }
+
+    public function checkSamePin($pin): bool
+    {
+        $currentCompany = $this->companyService->getCurrentCompany();
+        $pinExists = $this->employerRepository->findBy(['pin' => $pin,'company'=>$currentCompany]);
+
+        if($pinExists === []){
+            return false;
+        }else{
+
+          return true;
+        }
+
     }
 
 }

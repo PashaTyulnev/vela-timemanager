@@ -9,26 +9,63 @@
 
     {% block main_content %}
         <div class="mainContent">
-            <h2>Mitarbeiter</h2>
 
-            <table id="employers">
-                <thead>
-                <tr>
-                    <td>Nachname</td>
-                    <td>Vorname</td>
-                    <td>Nummer</td>
-                </tr>
-                </thead>
-                <tbody>
-                {% for employer in allEmployers %}
-                    <tr>
-                        <td>{{ employer.lastName }}</td>
-                        <td>{{ employer.firstName }}</td>
-                        <td>{{ employer.pin }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+            <div class="row">
+                <div class="col-6">
+                    <h2>Mitarbeiter</h2>
+                    <table id="employers">
+                        <thead>
+                        <tr>
+                            <td>Nachname</td>
+                            <td>Vorname</td>
+                            <td>Nummer</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for employer in allEmployers %}
+                            <tr>
+                                <td>{{ employer.lastName }}</td>
+                                <td>{{ employer.firstName }}</td>
+                                <td>{{ employer.pin }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-3">
+                    <h2>Neuer Mitarbeiter</h2>
+                    <form id="newEmployer" action="/new-employer" method="post">
+                        {% if error is defined%}
+                        <div class="alert alert-danger" role="alert">
+                           {{error}}
+                        </div>
+                        {%endif%}
+                        {% if success is defined%}
+                            <div class="alert alert-success" role="alert">
+                                {{success}}
+                            </div>
+                        {%endif%}
+
+
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">Vorname</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label">Nachname</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="pin" class="form-label">Arbeiter-Pin/Nummer (optional)</label>
+                            <input type="text" class="form-control" id="pin" name="pin">
+                        </div>
+                        <p></p>
+                        <button type="submit" class="btn btn-primary">Speichern</button>
+                    </form>
+                </div>
+            </div>
+
+
         </div>
 
         <script src="js/employers.js" ></script>

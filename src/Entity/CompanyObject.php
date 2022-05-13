@@ -15,8 +15,6 @@ class CompanyObject
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private $name;
 
     #[ORM\OneToMany(mappedBy: 'companyObject', targetEntity: CompanyMainUser::class)]
     private $mainUser;
@@ -26,6 +24,12 @@ class CompanyObject
 
     #[ORM\OneToMany(mappedBy: 'object', targetEntity: TimeEntry::class)]
     private $timeEntries;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private $street;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private $number;
 
     public function __construct()
     {
@@ -38,17 +42,6 @@ class CompanyObject
         return $this->id;
     }
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, companyMainUser>
@@ -118,6 +111,30 @@ class CompanyObject
                 $timeEntry->setObject(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStreet(): ?string
+    {
+        return $this->street;
+    }
+
+    public function setStreet(string $street): self
+    {
+        $this->street = $street;
+
+        return $this;
+    }
+
+    public function getNumber(): ?string
+    {
+        return $this->number;
+    }
+
+    public function setNumber(string $number): self
+    {
+        $this->number = $number;
 
         return $this;
     }

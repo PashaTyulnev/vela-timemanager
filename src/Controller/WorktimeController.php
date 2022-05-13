@@ -7,6 +7,7 @@ use App\Service\EmployerService;
 use App\Service\WorktimeService;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use JetBrains\PhpStorm\NoReturn;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,34 +30,73 @@ class WorktimeController extends AbstractController
         $this->companyService = $companyService;
     }
 
+    /**
+     * @throws \Exception
+     */
     #[Route('/load-worktime', name: 'loadWorktime')]
     public function loadWorktime(Request $request,$month = null,$year = null): \Symfony\Component\HttpFoundation\Response
     {
+        $dateNow = new \DateTime();
+        $yearNow = $dateNow->format('Y');
+        $monthNow = $dateNow->format('m');
 
         $object = $request->request->get("objectId");
 
+        if($request->request->get("date") !== null){
+            $date = $request->request->get("date");
+            $date = new \DateTime($date.'-1');
+            $month = $date->format('m');
+            $year = $date->format('Y');
+
+            $yearNow = $year;
+            $monthNow = $month;
+        }
+
         $timeEntriesOfObject = $this->worktimeService->getWorkTimeOfObject($object,$month,$year);
+        $monthsForSelect = $this->worktimeService->getMonthsForSelect($object);
+
 
         return $this->render('admin/worktime/loadWorktime.html.twig', [
             'timeEntries' => $timeEntriesOfObject,
-            'objectId' => $object
+            'objectId' => $object,
+            'monthsOfSelect' => $monthsForSelect,
+            'yearNow' => $yearNow,
+            'monthNow' => $monthNow,
         ]);
     }
 
-    #[Route('/export-pdf', name: 'export-pdf')]
-    public function exportPdf(Request $request,CompanyObjectRepository $objectRepository): \Symfony\Component\HttpFoundation\Response
+    /**
+     * @throws \Exception
+     */
+    #[NoReturn] #[Route('/export-pdf', name: 'export-pdf')]
+    public function exportPdf(Request $request,CompanyObjectRepository $objectRepository)
     {
+
+        $dateNow = new \DateTime();
+        $yearNow = $dateNow->format('Y');
+        $monthNow = $dateNow->format('m');
+
         //hier kommen die benötigten daten für den pdf export an
         $object = $request->request->get("objectId");
-        $month = $request->request->get("month");
 
-        $timeEntriesOfObject = $this->worktimeService->getWorkTimeOfObject($object);
+        if($request->request->get("datetime") !== null){
+            $date = $request->request->get("datetime");
+            $date = new \DateTime($date.'-1');
+            $month = $date->format('m');
+            $year = $date->format('Y');
+
+            $yearNow = $year;
+            $monthNow = $month;
+        }
+
+
+        $timeEntriesOfObject = $this->worktimeService->getWorkTimeOfObject($object,$monthNow,$yearNow);
         $objectName=$objectRepository->findOneBy(['id'=>$object]);
         $objectName=$objectName->getName();
 
+        // Configure Dompdf according to your needs
         $pdfOptions = new Options();
         $pdfOptions->set('defaultFont', 'Arial');
-
 
         // Instantiate Dompdf with our options
         $dompdf = new Dompdf($pdfOptions);
@@ -70,17 +110,16 @@ class WorktimeController extends AbstractController
         $dompdf->loadHtml($html);
 
         // (Optional) Setup the paper size and orientation 'portrait' or 'portrait'
-        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->setPaper('A4','portrait');
 
         // Render the HTML as PDF
         $dompdf->render();
 
-        // Output the generated PDF to Browser (inline view)
+//        // Output the generated PDF to Browser (inline view)
         $dompdf->stream("mypdf.pdf", [
             "Attachment" => false
         ]);
-        exit(0);
-        return $this->redirectToRoute('export-pdf');
 
+        exit;
     }
 }

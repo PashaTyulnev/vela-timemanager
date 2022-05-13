@@ -1,0 +1,65 @@
+{% extends 'base-admin.html.twig' %}
+{% use "admin/menu.html.twig" with menu as base_menu %}
+
+{% block body %}
+
+    {% block sidebar %}
+        {{ block('base_menu') }}
+    {% endblock %}
+
+    {% block main_content %}
+        <div class="mainContent">
+
+            <div class="row">
+                <div class="col-6">
+                    <h2>Objekte</h2>
+                    <table id="objects">
+                        <thead>
+                        <tr>
+                            <td>Straße + Nummer</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for object in allObjects %}
+                            <tr>
+                                <td>{{ object.street }} {{ object.number }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-3">
+                    <h2>Neues Objekt</h2>
+                    <form id="newObject" action="/new-object" method="post">
+                        {% if error is defined%}
+                            <div class="alert alert-danger" role="alert">
+                                {{error}}
+                            </div>
+                        {%endif%}
+                        {% if success is defined%}
+                            <div class="alert alert-success" role="alert">
+                                {{success}}
+                            </div>
+                        {%endif%}
+
+
+                        <div class="mb-3">
+                            <label for="street" class="form-label">Straße/Platz</label>
+                            <input type="text" class="form-control" id="street" name="street" required>
+
+                            <label for="number" class="form-label">Hausnummer</label>
+                            <input type="text" class="form-control" id="number" name="number" required>
+                        </div>
+
+                        <p></p>
+                        <button type="submit" class="btn btn-primary">Speichern</button>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+
+        <script src="js/objects.js" ></script>
+    {% endblock %}
+{% endblock %}

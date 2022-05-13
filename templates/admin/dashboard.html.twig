@@ -1,10 +1,50 @@
 {% extends 'base-admin.html.twig' %}
-{% use "admin/menu.html.twig" with menu as base_menu%}
+{% use "admin/menu.html.twig" with menu as base_menu %}
 
 {% block body %}
 
     {% block sidebar %}
         {{ block('base_menu') }}
     {% endblock %}
-
+    {% block main_content %}
+        <div class="row dashboardMain">
+            <div class="col-sm-6">
+                <div class="card m-5">
+                    <div class="card-body">
+                        <h5 class="card-title">Mitarbeiter</h5>
+                        <p class="card-text">Hier kannst du Mitarbeiter erstellen, bearbeiten und Löschen</p>
+                        <a class="btn btn-primary" href="/employers">Mitarbeiter</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card m-5">
+                    <div class="card-body">
+                        <h5 class="card-title">Zeiten</h5>
+                        <p class="card-text">Sehe alle Arbeitszeiten der Objekte und Mitarbeiter ein, erstelle Listen, exportiere es in PDFs.</p>
+                        <a  class="btn btn-primary" href="/workimes">Arbeitszeiten</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card m-5">
+                    <div class="card-body">
+                        <h5 class="card-title">Objekte</h5>
+                        <p class="card-text">Erstelle Objekte, bearbeite oder lösche sie.</p>
+                        <a  class="btn btn-primary" href="/objects">Objekte</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card m-5">
+                    <div class="card-body">
+                        <h5 class="card-title">Einstellungen</h5>
+                        <p class="card-text">Hier kannst du diverste Einstellúngen zur App vornehmen.</p>
+                        <a  class="btn btn-primary" href="#">Einstellungen</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
 {% endblock %}
+

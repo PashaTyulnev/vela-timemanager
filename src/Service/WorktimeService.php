@@ -5,8 +5,11 @@ namespace App\Service;
 use App\Repository\CompanyObjectRepository;
 use App\Repository\TimeEntryRepository;
 use DateInterval;
+use DatePeriod;
+use DateTime;
 use DateTimeImmutable;
 use Dompdf\Dompdf;
+use Exception;
 
 class WorktimeService
 {
@@ -23,9 +26,9 @@ class WorktimeService
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getWorkTimeOfObject($objectId, $month=null, $year=null)
+    public function getWorkTimeOfObject($objectId, $month=null, $year=null): array
     {
         //wenn kein Monat gegeben ist, lade Daten von aktuellem Monat
         if($month + $year == null){
@@ -35,6 +38,7 @@ class WorktimeService
 
         $firstDayInMonth = new DateTimeImmutable($year.'-'.$month.'-1');
         $lastDayInMonth =  new DateTimeImmutable($year.'-'.$month.'-1');
+
         $lastDayInMonth = $lastDayInMonth->format('Y-m-t');
 
         //check if object belongs to admin company
@@ -48,7 +52,7 @@ class WorktimeService
 
             return $this->formatTimeEntries($this->timeEntryRepository->findByDate($objectId,$firstDayInMonth,$lastDayInMonth));
         } else {
-            throw new \Exception("Keine Rechte dieses Objekt einzusehen");
+            throw new Exception("Keine Rechte dieses Objekt einzusehen");
         }
 
     }
@@ -135,6 +139,81 @@ class WorktimeService
         // Output the generated PDF to Browser
         $dompdf->stream();
 
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getMonthsForSelect($object)
+    {
+        // monate für frontend dropdown
+        $months = [];
+
+        $minDate = $this->timeEntryRepository->findMinDate($object);
+        $minDate = new DateTime($minDate[0][1]);
+        $firstDay = $minDate->format('Y-m-1');
+
+        $maxDate = $this->timeEntryRepository->findMaxDate($object);
+        $maxDate = new DateTime($maxDate[0][1]);
+        $lastDay = $maxDate->format('Y-m-t');
+
+        // jetzt kann man iterieren
+
+        $begin = new DateTime($firstDay);
+        $end = new DateTime($lastDay);
+
+        $interval = DateInterval::createFromDateString('1 month');
+        $period = new DatePeriod($begin, $interval, $end);
+        $i = 0;
+        foreach ($period as $dt) {
+            $month = $dt->format('m');
+            $year = $dt->format('Y');
+
+            if($month === '01'){
+                $mName = "Januar";
+            }
+            if($month === '02'){
+                $mName = "Februar";
+            }
+            if($month === '03'){
+                $mName = "März";
+            }
+            if($month === '04'){
+                $mName = "April";
+            }
+            if($month === '05'){
+                $mName = "Mai";
+            }
+            if($month === '06'){
+                $mName = "Juni";
+            }
+            if($month === '07'){
+                $mName = "Juli";
+            }
+            if($month === '08'){
+                $mName = "August";
+            }
+            if($month === '09'){
+                $mName = "September";
+            }
+            if($month === '10'){
+                $mName = "Oktober";
+            }
+            if($month === '11'){
+                $mName = "November";
+            }
+            if($month === '12'){
+                $mName = "Dezember";
+            }
+
+            $months[$i]['month'] = $mName;
+            $months[$i]['monthNumber'] = (int) $month;
+            $months[$i]['year'] = $year;
+
+            $i++;
+        }
+
+        return $months;
     }
 
 }
