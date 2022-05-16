@@ -15,7 +15,7 @@
                     <select class="form-select" aria-label="Default select example">
                         <option value="0">Objekt auswählen</option>
                         {% for object in allObjects %}
-                            <option class="companyObject" value="{{ object.id }}">{{ object.name }}</option>
+                            <option class="companyObject" value="{{ object.id }}">{{ object.street }} {{ object.number }}</option>
                         {% endfor %}
 
                     </select>
