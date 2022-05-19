@@ -71,7 +71,7 @@ class CompanyMainUser implements UserInterface,PasswordAuthenticatedUserInterfac
         return $this->roles;
     }
 
-    public function setRoles(string $roles): self
+    public function setRoles(array $roles): self
     {
         $this->roles = $roles;
 
@@ -112,7 +112,6 @@ class CompanyMainUser implements UserInterface,PasswordAuthenticatedUserInterfac
 
         return $this;
     }
-
 
 
 }

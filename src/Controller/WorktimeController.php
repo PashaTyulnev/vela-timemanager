@@ -92,7 +92,7 @@ class WorktimeController extends AbstractController
 
         $timeEntriesOfObject = $this->worktimeService->getWorkTimeOfObject($object,$monthNow,$yearNow);
         $objectName=$objectRepository->findOneBy(['id'=>$object]);
-        $objectName=$objectName->getName();
+        $objectName=$objectName->getStreet() . " " . $objectName->getNumber();
 
         // Configure Dompdf according to your needs
         $pdfOptions = new Options();

@@ -31,6 +31,12 @@ class CompanyObject
     #[ORM\Column(type: 'string', length: 255)]
     private $number;
 
+    #[ORM\Column(type: 'string', length: 255)]
+    private $password;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private $shortName;
+
     public function __construct()
     {
         $this->mainUser = new ArrayCollection();
@@ -135,6 +141,30 @@ class CompanyObject
     public function setNumber(string $number): self
     {
         $this->number = $number;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function getShortName(): ?string
+    {
+        return $this->shortName;
+    }
+
+    public function setShortName(string $shortName): self
+    {
+        $this->shortName = $shortName;
 
         return $this;
     }

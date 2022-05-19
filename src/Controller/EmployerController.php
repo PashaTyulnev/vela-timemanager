@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
-/**
- * @IsGranted("ROLE_MAIN")
- */
+
 class EmployerController extends AbstractController
 {
     private EmployerService $employerService;
@@ -32,7 +30,7 @@ class EmployerController extends AbstractController
         $this->companyService = $companyService;
     }
 
-    #[Route('/', name: 'mainBar')]
+    #[Route('/mainBar', name: 'mainBar')]
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
 

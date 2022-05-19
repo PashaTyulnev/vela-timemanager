@@ -339,7 +339,7 @@ class EmployerService
 
         $pinExists = $this->checkSamePin($pin);
 
-        //wenn es niemanden mit dieser PIN in dieser Firma gibt dann kann man die nehmen
+        //wenn es niemanden mit dieser PIN in dieser Firma gibt, dann kann man die nehmen
         if(!$pinExists){
             return $pin;
         }else{

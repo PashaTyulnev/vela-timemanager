@@ -17,18 +17,23 @@
                         <thead>
                         <tr>
                             <td>Straße + Nummer</td>
+                            <td>Username</td>
+                            <td>Objekt-Passwort</td>
                         </tr>
                         </thead>
                         <tbody>
+
                         {% for object in allObjects %}
                             <tr>
-                                <td>{{ object.street }} {{ object.number }}</td>
+                                <td>{{ object['street']}} {{object['number']}}</td>
+                                <td>{{ object['username']}}</td>
+                                <td>{{ object['password']}}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <div class="col-3">
+                <div class="col-3 createNewForm">
                     <h2>Neues Objekt</h2>
                     <form id="newObject" action="/new-object" method="post">
                         {% if error is defined%}

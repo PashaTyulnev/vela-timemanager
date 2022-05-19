@@ -92,19 +92,16 @@ class AdminController extends AbstractController
     public function newObject(Request $request): \Symfony\Component\HttpFoundation\Response
     {
 
-
         try{
             $newObject  = $this->objectService->createNewObject($request);
 
-            return $this->render('admin/objects/objects.html.twig', [
-                'allObjects' => $this->objectService->getAllObjects(),
-                'success' => $newObject['success']
-            ]);
+            return $this->redirectToRoute('adminObjects');
 
         }
         catch (\Exception $e){
+
             return $this->render('admin/objects/objects.html.twig', [
-                'allObjects' => $this->objectService->getAllObjects(),
+                'allObjects' => $this->companyService->getCompanyObjects(),
                 'error' => $e->getMessage()
             ]);
         }

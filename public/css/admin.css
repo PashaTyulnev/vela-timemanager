@@ -10,3 +10,11 @@
     margin-top: 100px;
 
 }
+.createNewForm{
+    background: #e6e6e6;
+    padding: 40px;
+    margin: auto;
+}
+.card-title{
+    font-size: 25px;
+}

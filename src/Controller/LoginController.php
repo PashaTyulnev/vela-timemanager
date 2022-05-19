@@ -9,14 +9,16 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class LoginController extends AbstractController
 {
-    #[Route('/login', name: 'login')]
+    #[Route('/', name: 'login')]
     public function index(AuthenticationUtils $authenticationUtils): Response
     {
 
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
 
-
+        if($error == "Invalid credentials."){
+            $error = "Zugangsdaten ungültig!";
+        }
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 

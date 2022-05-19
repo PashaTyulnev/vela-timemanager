@@ -35,7 +35,26 @@ class CompanyService
 
     }
 
-    public function getCompanyObjects(){
-       return $this->getCurrentCompany()->getCompanyObjects();
+    public function getCompanyObjects(): array
+    {
+        $companyObjects = $this->getCurrentCompany()->getCompanyObjects();
+        $objectsForReturn = [];
+        $i = 0;
+        foreach ($companyObjects as $object){
+            $objectsForReturn[$i]['street'] = $object->getStreet();
+            $objectsForReturn[$i]['number'] = $object->getNumber();
+            $objectsForReturn[$i]['id'] = $object->getId();
+
+            if($object->getMainUser()->getValues() != []){
+                $email = $object->getMainUser()->getValues()[0]->getEmail();
+            }else{
+                $email = "bitte Seite neustarten";
+            }
+            $objectsForReturn[$i]['username']  = $email;
+            $objectsForReturn[$i]['password']  = $object->getPassword();
+            $i++;
+        }
+
+       return $objectsForReturn;
     }
 }

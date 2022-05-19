@@ -5,7 +5,10 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
         App\Entity\CompanyMainUser:
-            algorithm: auto
+            algorithm: sodium
+            migrate_from:
+                - bcrypt # uses the "bcrypt" hasher with the default options
+                - legacy # uses the "legacy" hasher configured above
 
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
