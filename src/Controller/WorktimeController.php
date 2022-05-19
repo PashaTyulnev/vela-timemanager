@@ -98,12 +98,50 @@ class WorktimeController extends AbstractController
         $pdfOptions = new Options();
         $pdfOptions->set('defaultFont', 'Arial');
 
+        if($monthNow == "01"){
+            $monthName = "Januar";
+        }
+        if($monthNow == "02"){
+            $monthName = "Februar";
+        }
+        if($monthNow == "03"){
+            $monthName = "März";
+        }
+        if($monthNow == "04"){
+            $monthName = "April";
+        }
+        if($monthNow == "05"){
+            $monthName = "Mai";
+        }
+        if($monthNow == "06"){
+            $monthName = "Juni";
+        }
+        if($monthNow == "07"){
+            $monthName = "Juli";
+        }
+        if($monthNow == "08"){
+            $monthName = "August";
+        }
+        if($monthNow == "09"){
+            $monthName = "September";
+        }
+        if($monthNow == "10"){
+            $monthName = "Oktober";
+        }
+        if($monthNow == "11"){
+            $monthName = "November";
+        }
+        if($monthNow == "12"){
+            $monthName = "Dezember";
+        }
+
         // Instantiate Dompdf with our options
         $dompdf = new Dompdf($pdfOptions);
         // Retrieve the HTML generated in our twig file
         $html = $this->renderView('admin/worktime/pdf/pdf.html.twig', [
             'timeEntries'=>$timeEntriesOfObject,
-            'objectName' =>$objectName
+            'objectName' =>$objectName,
+            'month' => $monthName ." " .$yearNow
         ]);
 
         // Load HTML to Dompdf
