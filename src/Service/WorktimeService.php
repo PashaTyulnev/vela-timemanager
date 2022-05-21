@@ -28,13 +28,14 @@ class WorktimeService
     /**
      * @throws Exception
      */
-    public function getWorkTimeOfObject($objectId, $month=null, $year=null): array
+    public function getWorkTimeOfObject($objectId, $month=null, $year=null,$employer = null): array
     {
         //wenn kein Monat gegeben ist, lade Daten von aktuellem Monat
         if($month + $year == null){
             $month = date('m');
             $year = date('Y');
         }
+
 
         $firstDayInMonth = new DateTimeImmutable($year.'-'.$month.'-1');
         $lastDayInMonth =  new DateTimeImmutable($year.'-'.$month.'-1');
@@ -50,7 +51,7 @@ class WorktimeService
         //get all time entries of company
         if ($objectCompany === $adminCompany) {
 
-            return $this->formatTimeEntries($this->timeEntryRepository->findByDate($objectId,$firstDayInMonth,$lastDayInMonth));
+            return $this->formatTimeEntries($this->timeEntryRepository->findByDate($objectId,$firstDayInMonth,$lastDayInMonth,$employer));
         } else {
             throw new Exception("Keine Rechte dieses Objekt einzusehen");
         }
@@ -60,10 +61,11 @@ class WorktimeService
     private function formatTimeEntries($timeEntries)
     {
         $formatArray = [];
-
         $employerBuffer = [];
         $timeEntryIndex = 0;
         $bufferCounter = 0;
+        $totalFinalHours = 0;
+        $totalFinalMinutes = 0;
         foreach ($timeEntries as $timeEntry) {
 
             $employer = $timeEntry->getEmployer();
@@ -76,9 +78,9 @@ class WorktimeService
 
             if ($timeEntryType->getName() === "checkin") {
 
-                $formatArray[$timeEntryIndex]['name'] = $employerFirstName . " " . $employerLastName;
-                $formatArray[$timeEntryIndex]['start'] = $timeEntryDateTime;
-                $formatArray[$timeEntryIndex]['autoCheckout'] = false;
+                $formatArray['worktimes'][$timeEntryIndex]['name'] = $employerFirstName . " " . $employerLastName;
+                $formatArray['worktimes'][$timeEntryIndex]['start'] = $timeEntryDateTime;
+                $formatArray['worktimes'][$timeEntryIndex]['autoCheckout'] = false;
                 $employerBuffer[$bufferCounter][$employer->getId()] = $timeEntryIndex;
                 $timeEntryIndex++;
                 //buffer knows now, that employer X has checked id and stored his time entry index
@@ -86,10 +88,10 @@ class WorktimeService
             } elseif ($timeEntryType->getName() === "checkout") {
                 foreach ($employerBuffer as $index => $bufferItem) {
                     if ($employerId === key($bufferItem)) {
-                        $formatArray[$bufferItem[$employerId]]['end'] = $timeEntryDateTime;
+                        $formatArray['worktimes'][$bufferItem[$employerId]]['end'] = $timeEntryDateTime;
 
                         //total time
-                        $timeDifference = $formatArray[$bufferItem[$employerId]]['start']->diff($formatArray[$bufferItem[$employerId]]['end']);
+                        $timeDifference = $formatArray['worktimes'][$bufferItem[$employerId]]['start']->diff($formatArray['worktimes'][$bufferItem[$employerId]]['end']);
 
                         $totalHours = $this->getTotalHours($timeDifference);
                         $fullHours = floor($totalHours);
@@ -99,8 +101,9 @@ class WorktimeService
                         if (strlen($leftMinutes) === 1) {
                             $leftMinutes = "0" . $leftMinutes;
                         }
-                        $formatArray[$bufferItem[$employerId]]['sum'] = $fullHours . ":" . $leftMinutes;
-//
+                        $formatArray['worktimes'][$bufferItem[$employerId]]['sum'] = $fullHours . ":" . $leftMinutes;
+                      $totalFinalHours = $totalFinalHours + $fullHours;
+                      $totalFinalMinutes = $totalFinalMinutes + $leftMinutes;
 //                       if($autoCheckout === true){
 //                           $formatArray[$timeEntryIndex]['autoCheckout'] = true;
 //                       }
@@ -110,6 +113,15 @@ class WorktimeService
             }
 
         }
+
+        $hoursFromMinutes = floor($totalFinalMinutes / 60);
+        $minutesFromMinutes = ($totalFinalMinutes - floor($totalFinalMinutes)) * 60;
+
+        if (strlen($minutesFromMinutes) === 1) {
+            $minutesFromMinutes = "0" . $minutesFromMinutes;
+        }
+
+        $formatArray['totalHours'] = $totalFinalHours+$hoursFromMinutes . ":".$minutesFromMinutes;
         return $formatArray;
     }
 

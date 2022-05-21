@@ -1,13 +1,24 @@
 <form method="post" id="exportForm" action="/export-pdf">
     <div class="row exportContainer">
         <div class="col-auto">
-            <select class="form-select" aria-label="Default select example" name="datetime" >
+            <select class="form-select" aria-label="Default select example" name="datetime" id="monthSelect">
                 {% for date in monthsOfSelect %}
-                    <option class="monthSelect" data-object="{{objectId}}"
-                            value="{{ date['year'] }}-{{ date['monthNumber'] }}" {% if date['monthNumber'] == monthNow and date['year'] == yearNow %} selected {% endif %}>{{ date['month'] }} {{ date['year'] }}</option>
+                    <option class="monthSelect"
+                            data-object="{{objectId}}"
+                            value="{{ date['year'] }}-{{ date['monthNumber'] }}"{% if date['monthNumber'] == monthNow and date['year'] == yearNow %} selected {% endif %}>{{ date['month'] }} {{ date['year'] }}</option>
                 {% endfor %}
             </select>
         </div>
+        <div class="col-auto">
+            <select class="form-select" aria-label="Default select example" name="employer" id="employerSelect">
+                <option class="employerSelect"  data-object="{{objectId}}" value="all" {% if selectedEmployer is defined and selectedEmployer == null%}selected{%endif%}>Alle</option>
+                {% for employer in employers %}
+                    <option class="employerSelect"  data-object="{{objectId}}" value="{{employer.id}}" {% if selectedEmployer is defined and selectedEmployer == employer.id %}selected{%endif%}>{{employer.firstName}} {{employer.lastName}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
 
         <div class="col-auto">
             <button type="submit" class="btn btn-danger" id="exportPdf">
@@ -23,11 +34,11 @@
         <td>Arbeiter</td>
         <td>Beginn</td>
         <td>Ende</td>
-        <td>Gesamt</td>
+        <td>Gesamt ({{timeEntries['totalHours']}}h)</td>
     </tr>
     </thead>
     <tbody id="worktimeContent">
-    {% for timeEntry in timeEntries %}
+    {% for timeEntry in timeEntries['worktimes'] %}
         <tr>
 
             <td>{{ timeEntry['name'] }}</td>

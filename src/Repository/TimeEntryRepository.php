@@ -81,18 +81,28 @@ class TimeEntryRepository extends ServiceEntityRepository
     /**
      * @throws NonUniqueResultException
      */
-    public function findByDate($objectId, $from, $to)
+    public function findByDate($objectId, $from, $to,$employer)
     {
-        return $this->createQueryBuilder('t')
+
+        $result =
+            $this->createQueryBuilder('t')
             ->andWhere('t.object = :id')
             ->setParameter('id', $objectId)
             ->andWhere('t.createdAt >= :from')
             ->setParameter('from', $from)
             ->andWhere('t.createdAt <= :to')
-            ->setParameter('to', $to)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('to', $to);
+
+        if($employer != null){
+            $result->andWhere('t.employer = :eid')
+                ->setParameter('eid', $employer);
+        }
+
+        return $result->getQuery()->getResult();
+
     }
+
+
 
     public function findMinDate($object)
     {

@@ -41,6 +41,7 @@ class WorktimeController extends AbstractController
         $monthNow = $dateNow->format('m');
 
         $object = $request->request->get("objectId");
+        $employer = null;
 
         if($request->request->get("date") !== null){
             $date = $request->request->get("date");
@@ -52,9 +53,22 @@ class WorktimeController extends AbstractController
             $monthNow = $month;
         }
 
-        $timeEntriesOfObject = $this->worktimeService->getWorkTimeOfObject($object,$month,$year);
-        $monthsForSelect = $this->worktimeService->getMonthsForSelect($object);
+        if($request->request->get("employer") !== null){
+           $employer = $request->request->get("employer");
+        }
 
+
+        //wenn alle Zeiten voll allen Arbeitern
+        if(is_numeric($employer)){
+            $employer = (int)$employer;
+        }else{
+            $employer = null;
+        }
+
+
+        $timeEntriesOfObject = $this->worktimeService->getWorkTimeOfObject($object,$month,$year,$employer);
+        $monthsForSelect = $this->worktimeService->getMonthsForSelect($object);
+        $allEmployers = $this->employerService->getAllEmployers();
 
         return $this->render('admin/worktime/loadWorktime.html.twig', [
             'timeEntries' => $timeEntriesOfObject,
@@ -62,6 +76,8 @@ class WorktimeController extends AbstractController
             'monthsOfSelect' => $monthsForSelect,
             'yearNow' => $yearNow,
             'monthNow' => $monthNow,
+            'employers' => $allEmployers,
+            'selectedEmployer' => $employer
         ]);
     }
 
@@ -75,12 +91,13 @@ class WorktimeController extends AbstractController
         $dateNow = new \DateTime();
         $yearNow = $dateNow->format('Y');
         $monthNow = $dateNow->format('m');
-
+        $employer = null;
         //hier kommen die benötigten daten für den pdf export an
         $object = $request->request->get("objectId");
 
         if($request->request->get("datetime") !== null){
             $date = $request->request->get("datetime");
+
             $date = new \DateTime($date.'-1');
             $month = $date->format('m');
             $year = $date->format('Y');
@@ -89,8 +106,18 @@ class WorktimeController extends AbstractController
             $monthNow = $month;
         }
 
+        if($request->request->get("employer") !== null){
+            $employer = $request->request->get("employer");
+        }
+        //wenn alle Zeiten voll allen Arbeitern
+        if(is_numeric($employer)){
+            $employer = (int)$employer;
+        }else{
+            $employer = null;
+        }
 
-        $timeEntriesOfObject = $this->worktimeService->getWorkTimeOfObject($object,$monthNow,$yearNow);
+        $timeEntriesOfObject = $this->worktimeService->getWorkTimeOfObject($object,$monthNow,$yearNow,$employer);
+
         $objectName=$objectRepository->findOneBy(['id'=>$object]);
         $objectName=$objectName->getStreet() . " " . $objectName->getNumber();
 
@@ -135,13 +162,19 @@ class WorktimeController extends AbstractController
             $monthName = "Dezember";
         }
 
+        if($employer != null){
+            $employer = $this->employerService->getEmployerById($employer);
+        }
+
         // Instantiate Dompdf with our options
         $dompdf = new Dompdf($pdfOptions);
         // Retrieve the HTML generated in our twig file
+
         $html = $this->renderView('admin/worktime/pdf/pdf.html.twig', [
             'timeEntries'=>$timeEntriesOfObject,
             'objectName' =>$objectName,
-            'month' => $monthName ." " .$yearNow
+            'month' => $monthName ." " .$yearNow,
+            'employer' => $employer,
         ]);
 
         // Load HTML to Dompdf

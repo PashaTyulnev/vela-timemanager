@@ -64,17 +64,48 @@ function activateListener() {
         let date = this.value
         let objectId = $(this).data('object')
 
-        console.log(objectId)
+        //ist id oder string "all"
+        let employer = $('#employerSelect').val();
+        console.log( $(this))
 
         $.ajax({
             url: '/load-worktime',
             data: {
                 objectId: objectId,
-                date:date
+                date:date,
+                employer:employer
             },
             method: 'POST'
         }).then(function (response) {
             $('#workTimeTableContainer').html(response)
         })
     })
+
+    $('.employerSelect').on('click', function () {
+
+        //ist id oder string "all"
+        let monthSelect = $('#monthSelect option:selected');
+
+        // month, year 12-2021
+        let date = monthSelect.val();
+
+        let objectId = $(monthSelect).data('object')
+
+        //ist id oder string "all"
+        let employer = $(this).val();
+
+
+        $.ajax({
+            url: '/load-worktime',
+            data: {
+                objectId: objectId,
+                date:date,
+                employer:employer
+            },
+            method: 'POST'
+        }).then(function (response) {
+            $('#workTimeTableContainer').html(response)
+        })
+    })
+
 }

@@ -59,7 +59,7 @@ class EmployerService
 
     public function getAllEmployers()
     {
-        return $this->employerRepository->findAll();
+        return $this->employerRepository->findBy(['company'=>$this->companyService->getCurrentCompany()]);
     }
 
     public function getEmployerById($id)
