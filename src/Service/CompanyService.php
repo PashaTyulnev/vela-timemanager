@@ -41,6 +41,7 @@ class CompanyService
         $objectsForReturn = [];
         $i = 0;
         foreach ($companyObjects as $object){
+            $objectsForReturn[$i]['name'] = $object->getName();
             $objectsForReturn[$i]['street'] = $object->getStreet();
             $objectsForReturn[$i]['number'] = $object->getNumber();
             $objectsForReturn[$i]['id'] = $object->getId();

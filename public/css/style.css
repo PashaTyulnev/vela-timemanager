@@ -13,7 +13,7 @@
     --entered-pin-color:#a4a4a4;
     --login-button-background:#151715;
     --login-button-text:#cecece;
-    --login-container-color:#1e1e1e;
+    --login-container-color: #ffffff;
 }
 
 .card-body {
@@ -36,7 +36,7 @@ body {
 .loginContainer{
     background-color: var(--login-container-color);
     margin:0;
-    padding: 10px!important;
+    padding: 20px!important;
     padding-top:30px!important;
 }
 
@@ -298,9 +298,18 @@ body {
     background-color: var(--login-button-background);
     color: var(--login-button-text);
 }
+
+.loginButton:hover{
+   color: white;
+}
 .logoFont{
     color: white;
     font-weight: 300;
     font-size: 40px;
     margin-bottom: 20px;
+}
+
+.mainLogo{
+    width:100%;
+    margin-bottom: 10px;
 }

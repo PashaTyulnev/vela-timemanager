@@ -6,13 +6,13 @@
 
     <form action="{{ path('login') }}" method="post">
 
-        <section class="vh-100" style="background-color: #242424;">
+        <section class="vh-100" style="background-color: #828282;">
             <div class="container py-5 h-100">
                 <div class="row d-flex justify-content-center align-items-center h-100">
                     <div class="col-12 col-md-8 col-lg-6 col-xl-5">
                         <div class="card shadow-2-strong loginCard">
                             <div class="card-body p-5 text-center loginContainer">
-                                <h3 class="logoFont">Stamp-You</h3>
+                                <img src="assets/img/stampulogo.png" class="mainLogo">
                                 <div class="form-outline mb-4">
                                     <input placeholder="Benutzername" type="text" id="username" name="_username" value="{{ last_username }}" class="form-control form-control-lg" />
                                 </div>
@@ -22,10 +22,10 @@
                                 </div>
 
                                 <!-- Checkbox -->
-                                <div class="form-check d-flex justify-content-start mb-4">
-                                    <input  class="form-check-input" type="checkbox" name="_remember_me" id="stay"checked />
-                                    <label class="form-check-label remember" for="stay">Eingeloggt bleiben </label>
-                                </div>
+{#                                <div class="form-check d-flex justify-content-start mb-4">#}
+{#                                    <input  class="form-check-input" type="checkbox" name="_remember_me" id="stay"checked />#}
+{#                                    <label class="form-check-label remember" for="stay">Eingeloggt bleiben </label>#}
+{#                                </div>#}
 
                                 <button class="btn btn-lg btn-block loginButton" type="submit">Einloggen</button>
 

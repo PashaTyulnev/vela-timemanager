@@ -37,6 +37,9 @@ class CompanyObject
     #[ORM\Column(type: 'string', length: 255)]
     private $shortName;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $name;
+
     public function __construct()
     {
         $this->mainUser = new ArrayCollection();
@@ -165,6 +168,18 @@ class CompanyObject
     public function setShortName(string $shortName): self
     {
         $this->shortName = $shortName;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }

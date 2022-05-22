@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="manifest" href="manifest.json">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+        <meta name="theme-color" content="#ffffff">
+
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <title>{% block title %}Zeiterfassung - Vela{% endblock %}</title>
@@ -19,5 +24,17 @@
         {% block body %}
         {% endblock %}
         <script src="bootstrap/js/bootstrap.bundle.min.js" ></script>
+        <script type="text/javascript">
+            if ('serviceWorker' in navigator) {
+                console.log("Will the service worker register?");
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(function(reg){
+                        console.log("Yes, it did.");
+                    }).catch(function(err) {
+                    console.log("No it didn't. This happened:", err)
+                });
+            }
+        </script>
+
     </body>
 </html>
