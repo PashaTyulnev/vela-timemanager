@@ -103,6 +103,7 @@ class WorktimeService
                         }
                         $formatArray['worktimes'][$bufferItem[$employerId]]['sum'] = $fullHours . ":" . $leftMinutes;
                       $totalFinalHours = $totalFinalHours + $fullHours;
+
                       $totalFinalMinutes = $totalFinalMinutes + $leftMinutes;
 //                       if($autoCheckout === true){
 //                           $formatArray[$timeEntryIndex]['autoCheckout'] = true;
@@ -114,8 +115,10 @@ class WorktimeService
 
         }
 
+        //z.B. 110min sind 1h und 50min -> 1h
         $hoursFromMinutes = floor($totalFinalMinutes / 60);
-        $minutesFromMinutes = ($totalFinalMinutes - floor($totalFinalMinutes)) * 60;
+
+        $minutesFromMinutes = $totalFinalMinutes % 60;
 
         if (strlen($minutesFromMinutes) === 1) {
             $minutesFromMinutes = "0" . $minutesFromMinutes;
