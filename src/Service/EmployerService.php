@@ -283,7 +283,8 @@ class EmployerService
 
     public function getLastMainCheckin($employer): ?TimeEntry
     {
-        return $this->timeEntryRepository->findOneBy(['employer' => $employer, 'mainCheckin' => true], ['createdAt' => 'DESC']);
+
+        return $this->timeEntryRepository->findOneBy(['employer' => $employer, 'mainCheckin' => 1], ['createdAt' => 'DESC']);
     }
 
     /**

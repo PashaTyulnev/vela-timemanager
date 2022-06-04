@@ -65,12 +65,12 @@ class CheckWorktimeCommand extends Command
             $lastMainCheckin = $this->employerService->getLastMainCheckin($employer);
             $lastTimeEntry = $this->employerService->getLastTimeEntryOfEmployer($employer);
 
-            $io->comment("-------------------");
-            $io->comment("CHECK USER ". $employer->getFirstName() . " ". $employer->getLastName());
-
             if ($lastMainCheckin != null) {
 
                 if ($lastTimeEntry->getTimeEntryType()->getName() !== 'checkout') {
+
+                    $io->comment("-------------------");
+                    $io->comment("USER AUTO-CHECKOUT ". $employer->getFirstName() . " ". $employer->getLastName());
 
                     $tz = new DateTimeZone("Europe/Berlin");
                     $timeNow = new DateTime($this->employerService->getNow()->format("Y-m-d H:i:s"), $tz);

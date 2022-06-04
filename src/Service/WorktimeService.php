@@ -58,7 +58,7 @@ class WorktimeService
 
     }
 
-    private function formatTimeEntries($timeEntries)
+    private function formatTimeEntries($timeEntries): array
     {
         $formatArray = [];
         $employerBuffer = [];
@@ -76,8 +76,9 @@ class WorktimeService
             $timeEntryType = $timeEntry->getTimeEntryType();
             $autoCheckout = $timeEntry->getAutoCheckOut();
 
-            if ($timeEntryType->getName() === "checkin") {
 
+
+            if ($timeEntryType->getName() === "checkin") {
                 $formatArray['worktimes'][$timeEntryIndex]['name'] = $employerFirstName . " " . $employerLastName;
                 $formatArray['worktimes'][$timeEntryIndex]['start'] = $timeEntryDateTime;
                 $formatArray['worktimes'][$timeEntryIndex]['autoCheckout'] = false;
@@ -86,12 +87,19 @@ class WorktimeService
                 //buffer knows now, that employer X has checked id and stored his time entry index
 
             } elseif ($timeEntryType->getName() === "checkout") {
+
+
+                if(isset($employerBuffer[0])){
+                    $employerBuffer = $employerBuffer[0];
+                }
+
                 foreach ($employerBuffer as $index => $bufferItem) {
-                    if ($employerId === key($bufferItem)) {
-                        $formatArray['worktimes'][$bufferItem[$employerId]]['end'] = $timeEntryDateTime;
+//                    dump($employerBuffer);
+                    if ($employerId === $index) {
+                        $formatArray['worktimes'][$bufferItem]['end'] = $timeEntryDateTime;
 
                         //total time
-                        $timeDifference = $formatArray['worktimes'][$bufferItem[$employerId]]['start']->diff($formatArray['worktimes'][$bufferItem[$employerId]]['end']);
+                        $timeDifference = $formatArray['worktimes'][$bufferItem]['start']->diff($formatArray['worktimes'][$bufferItem]['end']);
 
                         $totalHours = $this->getTotalHours($timeDifference);
                         $fullHours = floor($totalHours);
@@ -101,7 +109,7 @@ class WorktimeService
                         if (strlen($leftMinutes) === 1) {
                             $leftMinutes = "0" . $leftMinutes;
                         }
-                        $formatArray['worktimes'][$bufferItem[$employerId]]['sum'] = $fullHours . ":" . $leftMinutes;
+                        $formatArray['worktimes'][$bufferItem]['sum'] = $fullHours . ":" . $leftMinutes;
                       $totalFinalHours = $totalFinalHours + $fullHours;
 
                       $totalFinalMinutes = $totalFinalMinutes + $leftMinutes;
