@@ -34,7 +34,7 @@ class WorktimeController extends AbstractController
      * @throws \Exception
      */
     #[Route('/load-worktime', name: 'loadWorktime')]
-    public function loadWorktime(Request $request,$month = null,$year = null): \Symfony\Component\HttpFoundation\Response
+    public function loadWorkTime(Request $request,$month = null,$year = null): \Symfony\Component\HttpFoundation\Response
     {
         $dateNow = new \DateTime();
         $yearNow = $dateNow->format('Y');
@@ -192,5 +192,43 @@ class WorktimeController extends AbstractController
         ]);
 
         exit;
+    }
+
+    #[Route('/edit-time-entry', name: 'editTimeEntry')]
+    public function editTimeEntry(Request $request): \Symfony\Component\HttpFoundation\Response
+    {
+        $uid = $request->request->get("uid");
+
+        $timeEntryGroup = $this->worktimeService->getTimeEntryGroup($uid);
+        $employer = $this->worktimeService->getEmployerByUid($uid);
+
+        return $this->render('admin/worktime/editTimeEntry.html.twig', [
+            'timeEntries'=>$timeEntryGroup,
+            'employer' => $employer
+        ]);
+    }
+
+    #[Route('/save-time-entry')]
+    public function saveTimeEntry(Request $request): \Symfony\Component\HttpFoundation\Response
+    {
+
+        $allTimeEntriesData = $request->request->all();
+
+        $this->worktimeService->saveTimeEntryChange($allTimeEntriesData);
+
+        exit;
+
+    }
+
+    #[Route('/delete-time-entry')]
+    public function deleteTimeEntry(Request $request): \Symfony\Component\HttpFoundation\Response
+    {
+
+        $uid = $request->request->get('uid');
+
+        $this->worktimeService->deleteTimeEntries($uid);
+
+        exit;
+
     }
 }

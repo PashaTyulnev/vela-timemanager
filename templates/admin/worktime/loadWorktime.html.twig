@@ -1,3 +1,4 @@
+
 <form method="post" id="exportForm" action="/export-pdf">
     <div class="row exportContainer">
         <div class="col-auto col-12 col-md-2">
@@ -25,7 +26,7 @@
             </button>
         </div>
     </div>
-    <input type="hidden" name="objectId" value="{{ objectId }}">
+    <input type="hidden" name="objectId" value="{{ objectId }}" id="objectId">
 </form>
 <table id="worktime">
     <thead>
@@ -39,8 +40,8 @@
     </thead>
     <tbody id="worktimeContent">
     {% if timeEntries['worktimes'] is defined %}
-        {% for timeEntry in timeEntries['worktimes'] %}
-            <tr data-uid="diksucker">
+        {% for uid,timeEntry in timeEntries['worktimes'] %}
+            <tr data-uid="{{uid}}">
 
                 <td>{{ timeEntry['name'] }}</td>
                 <td>{{ timeEntry['start'] | date("d.m.Y H:i") }}</td>

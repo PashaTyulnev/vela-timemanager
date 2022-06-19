@@ -37,6 +37,9 @@ class TimeEntry
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $uid;
 
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private $removed;
+
 
     public function getId(): ?int
     {
@@ -123,6 +126,18 @@ class TimeEntry
     public function setUid(?string $uid): self
     {
         $this->uid = $uid;
+
+        return $this;
+    }
+
+    public function getRemoved(): ?bool
+    {
+        return $this->removed;
+    }
+
+    public function setRemoved(?bool $removed): self
+    {
+        $this->removed = $removed;
 
         return $this;
     }

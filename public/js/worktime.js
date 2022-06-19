@@ -4,18 +4,21 @@ $(document).ready(function () {
     $('#objectSelect').on("change", function () {
 
         let objectId = this.value;
-        $.ajax({
-            url: '/load-worktime',
-            data: {
-                objectId: objectId
-            },
-            method: 'POST'
-        }).then(function (response) {
-            $('#workTimeTableContainer').html(response)
-        })
+        loadWorkTimeByObjectId(objectId)
     })
 });
 
+function loadWorkTimeByObjectId(objectId){
+    $.ajax({
+        url: '/load-worktime',
+        data: {
+            objectId: objectId
+        },
+        method: 'POST'
+    }).then(function (response) {
+        $('#workTimeTableContainer').html(response)
+    })
+}
 
 function createWorktimeTable() {
     $('#worktime').DataTable({
@@ -33,6 +36,7 @@ function destroyWorktimeTable() {
 
 function activateListener() {
     let uid = ""
+
     $('#monthSelect').on('change', function () {
         buildWorkTimeList()
     })
@@ -41,18 +45,59 @@ function activateListener() {
         buildWorkTimeList()
     })
 
+    //Zeiteintrag bearbeiten
     $('.editTimeEntry').on('click', function () {
         uid = $(this).parent().parent().data("uid")
 
-        var myModal = new bootstrap.Modal(document.getElementById('timeEntryPopup'))
+        let objectId = $('#objectId').val()
 
-        myModal.show()
+        $.ajax({
+            url: '/edit-time-entry',
+            data: {
+                uid: uid
+            },
+            method: 'POST'
+        }).then(function (response) {
+            $('#modalContainer').html(response)
+            let timeEntryPopup = new bootstrap.Modal(document.getElementById('timeEntryPopup'))
+            timeEntryPopup.show()
+
+            $('#editTimeEntriesForm').on('submit',function (e){
+                e.preventDefault()
+                let formData = new FormData(document.querySelector('#editTimeEntriesForm'))
+
+                $.ajax({
+                    url: '/save-time-entry',
+                    data: formData,
+                    method: 'POST',
+                    processData: false,
+                    contentType: false,
+                }).then(function (response) {
+                    timeEntryPopup.hide()
+                    loadWorkTimeByObjectId(objectId)
+                })
+
+            })
+        })
     })
 
     $('.deleteTimeEntry').on('click', function () {
         uid = $(this).parent().parent().data("uid")
+        let objectId = $('#objectId').val()
 
-        console.log(this)
+        if (confirm('Möchtest du diesen Zeiteintrag wirklich löschen?')) {
+            $.ajax({
+                url: '/delete-time-entry',
+                data: {
+                    uid:uid
+                },
+                method: 'POST',
+            }).then(function (response) {
+
+                loadWorkTimeByObjectId(objectId)
+            })
+        }
+
     })
 
 }

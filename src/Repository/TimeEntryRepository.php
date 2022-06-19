@@ -99,6 +99,7 @@ class TimeEntryRepository extends ServiceEntityRepository
                 ->setParameter('eid', $employer);
         }
 
+
         return $result->getQuery()->getResult();
 
     }

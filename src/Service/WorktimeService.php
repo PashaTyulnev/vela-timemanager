@@ -8,6 +8,7 @@ use DateInterval;
 use DatePeriod;
 use DateTime;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Dompdf\Dompdf;
 use Exception;
 
@@ -16,13 +17,15 @@ class WorktimeService
     private CompanyObjectRepository $companyObjectRepository;
     private CompanyService $companyService;
     private TimeEntryRepository $timeEntryRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(CompanyObjectRepository $companyObjectRepository, CompanyService $companyService, TimeEntryRepository $timeEntryRepository)
+    public function __construct(CompanyObjectRepository $companyObjectRepository, CompanyService $companyService, TimeEntryRepository $timeEntryRepository, EntityManagerInterface $entityManager)
     {
 
         $this->companyObjectRepository = $companyObjectRepository;
         $this->companyService = $companyService;
         $this->timeEntryRepository = $timeEntryRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -74,8 +77,9 @@ class WorktimeService
             $timeEntryType = $timeEntry->getTimeEntryType();
             $autoCheckout = $timeEntry->getAutoCheckOut();
             $uid = $timeEntry->getUid();
+            $removed = $timeEntry->getRemoved();
 
-            if ($uid != null) {
+            if ($uid != null && !$removed) {
                 //wenn der Eintrag ein checkin ist, dann wissen wir den Startpunkt
                 if ($timeEntryType->getName() === "checkin") {
                     $formatArray['worktimes'][$uid]['name'] = $employerFirstName . " " . $employerLastName;
@@ -244,6 +248,92 @@ class WorktimeService
         }
 
         return $months;
+    }
+
+    public function getTimeEntryGroup($uid): array
+    {
+
+        return $this->formatTimeEntryGroup($this->timeEntryRepository->findBy(['uid'=>$uid]));
+
+    }
+
+    public function formatTimeEntryGroup($timeEntries){
+        $array = [];
+
+        foreach ($timeEntries as $index => $timeEntry){
+
+            $employer = $timeEntry->getEmployer();
+            $timeEntryDateTime = $timeEntry->getCreatedAt();
+            $timeEntryType = $timeEntry->getTimeEntryType();
+
+            $array[$index]['type'] = $timeEntryType->getName();
+            $array[$index]['time'] = $timeEntryDateTime;
+            $array[$index]['id'] = $timeEntry->getId();
+        }
+
+        return $array;
+    }
+
+    public function getEmployerByUid($uid): ?\App\Entity\CompanyUser
+    {
+        return $this->timeEntryRepository->findBy(['uid'=>$uid])[0]->getEmployer();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function saveTimeEntryChange(array $allTimeEntriesData)
+    {
+        $idsToChange = [];
+
+        foreach ($allTimeEntriesData as $index => $date){
+            $mix = explode("-", $index);
+            $id = $mix[1];
+            $idsToChange[] = $id;
+
+//            $realTimeEntry = $this->timeEntryRepository->findOneBy(['id'=>$id]);
+//
+//            if($type == "date"){
+//              $date =  DateTimeImmutable::createFromFormat('Y-m-d', $date)->format('Y-m-d');
+//
+//            }
+
+//            $this->entityManager->persist($timeEntry);
+//            $this->entityManager->flush();
+
+        }
+
+
+        $idsToChange = array_unique($idsToChange);
+
+        foreach ($idsToChange as $id){
+            $newDate = $allTimeEntriesData['date-'.$id];
+            $newTime = $allTimeEntriesData['time-'.$id];
+            $realTimeEntry = $this->timeEntryRepository->findOneBy(['id'=>$id]);
+
+            $dateToSave =  new DateTimeImmutable($newDate. " " . $newTime);
+
+            $realTimeEntry->setCreatedAt($dateToSave);
+
+            $this->entityManager->persist($realTimeEntry);
+            $this->entityManager->flush();
+
+
+        }
+    }
+
+    public function deleteTimeEntries($uid): bool
+    {
+        $timeEntries = $this->timeEntryRepository->findBy(['uid'=> $uid]);
+
+        foreach ($timeEntries as $timeEntry){
+            $timeEntry->setRemoved(true);
+            $this->entityManager->persist($timeEntry);
+            $this->entityManager->flush();
+        }
+
+        return true;
+
     }
 
 }
