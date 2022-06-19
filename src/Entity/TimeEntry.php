@@ -34,6 +34,9 @@ class TimeEntry
     #[ORM\Column(type: 'boolean')]
     private $mainCheckin;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $uid;
+
 
     public function getId(): ?int
     {
@@ -108,6 +111,18 @@ class TimeEntry
     public function setMainCheckin(bool $mainCheckin): self
     {
         $this->mainCheckin = $mainCheckin;
+
+        return $this;
+    }
+
+    public function getUid(): ?string
+    {
+        return $this->uid;
+    }
+
+    public function setUid(?string $uid): self
+    {
+        $this->uid = $uid;
 
         return $this;
     }

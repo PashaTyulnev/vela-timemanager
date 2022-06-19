@@ -1,4 +1,4 @@
-$( document ).ready(function() {
+$(document).ready(function () {
 
 
     $('#objectSelect').on("change", function () {
@@ -32,6 +32,7 @@ function destroyWorktimeTable() {
 }
 
 function activateListener() {
+    let uid = ""
     $('#monthSelect').on('change', function () {
         buildWorkTimeList()
     })
@@ -40,9 +41,23 @@ function activateListener() {
         buildWorkTimeList()
     })
 
+    $('.editTimeEntry').on('click', function () {
+        uid = $(this).parent().parent().data("uid")
+
+        var myModal = new bootstrap.Modal(document.getElementById('timeEntryPopup'))
+
+        myModal.show()
+    })
+
+    $('.deleteTimeEntry').on('click', function () {
+        uid = $(this).parent().parent().data("uid")
+
+        console.log(this)
+    })
+
 }
 
-function buildWorkTimeList(){
+function buildWorkTimeList() {
     //ist id oder string "all"
     let monthSelect = $('#monthSelect option:selected');
 
@@ -59,11 +74,12 @@ function buildWorkTimeList(){
         url: '/load-worktime',
         data: {
             objectId: objectId,
-            date:date,
-            employer:employer
+            date: date,
+            employer: employer
         },
         method: 'POST'
     }).then(function (response) {
         $('#workTimeTableContainer').html(response)
+        console.log("HE")
     })
 }

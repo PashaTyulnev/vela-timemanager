@@ -86,12 +86,13 @@ class TimeEntryRepository extends ServiceEntityRepository
 
         $result =
             $this->createQueryBuilder('t')
-            ->andWhere('t.object = :id')
-            ->setParameter('id', $objectId)
-            ->andWhere('t.createdAt >= :from')
-            ->setParameter('from', $from)
-            ->andWhere('t.createdAt <= :to')
-            ->setParameter('to', $to);
+                ->andWhere('t.object = :id')
+                ->setParameter('id', $objectId)
+                ->andWhere('t.createdAt >= :from')
+                ->setParameter('from', $from)
+                ->andWhere('t.createdAt <= :to')
+                ->setParameter('to', $to)
+                ->orderBy('t.createdAt','ASC');
 
         if($employer != null){
             $result->andWhere('t.employer = :eid')
@@ -106,8 +107,8 @@ class TimeEntryRepository extends ServiceEntityRepository
 
     public function findMinDate($object)
     {
-       $query=$this->entityManager->createQuery('SELECT MIN(t.createdAt) FROM App\Entity\TimeEntry t WHERE t.object='.$object);
-       return $query->getResult();
+        $query=$this->entityManager->createQuery('SELECT MIN(t.createdAt) FROM App\Entity\TimeEntry t WHERE t.object='.$object);
+        return $query->getResult();
     }
 
     public function findMaxDate($object)

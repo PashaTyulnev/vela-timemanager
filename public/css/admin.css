@@ -1,10 +1,33 @@
 .mainContent{
     margin: 50px;
 }
+
+@media only screen and (max-width: 600px) {
+    .mainContent{
+        margin: 20px;
+    }
+    select{
+        margin-bottom: 10px;
+        width: 100%;
+        display: block;
+    }
+    #exportPdf{
+        width: 100%;
+        display: block;
+    }
+    td{
+        padding:5px!important;
+        vertical-align: top;
+    }
+    table{
+        font-size: 12px;
+    }
+
+}
+
 .exportContainer{
     margin-bottom: 20px;
 }
-
 
 .dashboardMain{
     margin-top: 100px;
@@ -20,4 +43,8 @@
 }
 #worktimeContent,#objects,#employers{
     width:100%!important;
+}
+.trash,.edit{
+    margin-right: 10px;
+    display: inline;
 }

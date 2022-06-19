@@ -84,6 +84,9 @@ class EmployerService
     public function userCheckAction($id, $checkInType, $autoCheckoutTime = 0): TimeEntry
     {
 
+        //employer
+        $employer = $this->getEmployerById($id);
+
         //timeEntryType Object
         $this->timeEntryType = $this->getTimeEntryTypeByName($checkInType);
 
@@ -99,10 +102,26 @@ class EmployerService
 
         $timeEntry->setMainCheckin(false);
 
+        //wenn es der erste checkin ist
         if (isset($isValid) && $isValid === "mainCheckin") {
             $timeEntry->setMainCheckin(true);
+            //uniq id, damit man weiß, welche Einträge zusammengehören
+            $uniqueId = uniqid();
+
         }
-        $timeEntry->setEmployer($this->getEmployerById($id));
+        //wenn es alles außer mainCheckin ist, muss man den letzten "mainCheckin" - Eintrag holen und von dem die uid
+        elseif(isset($isValid)){
+
+            $mainCheckin = $this->timeEntryRepository->findOneBy(['mainCheckin' => 1,'employer'=>$employer],['createdAt' => 'DESC']);
+            $uniqueId = $mainCheckin->getUid() != null ? $mainCheckin->getUid() : null;
+        }
+        else{
+
+            $uniqueId = null;
+        }
+
+        $timeEntry->setUid($uniqueId);
+        $timeEntry->setEmployer($employer);
         $timeEntry->setTimeEntryType($this->timeEntryType);
 
         if ($autoCheckoutTime !== 0) {
@@ -111,6 +130,8 @@ class EmployerService
             $timeEntry->setCreatedAt($this->date);
         }
         $timeEntry->setObject($this->companyService->getCurrentObject());
+
+
         $this->entityManager->persist($timeEntry);
         $this->entityManager->flush();
 
@@ -307,7 +328,7 @@ class EmployerService
 
         //wenn pin automatisch generiert werden soll
         if(!$request->get('pin')){
-           $pin = $this->createNewEmployerPin();
+            $pin = $this->createNewEmployerPin();
         }else{
             $pin = $request->get('pin');
             $pinExists = $this->checkSamePin($pin);
@@ -344,7 +365,7 @@ class EmployerService
         if(!$pinExists){
             return $pin;
         }else{
-           $this->createNewEmployerPin();
+            $this->createNewEmployerPin();
         }
         return 0;
     }
@@ -358,7 +379,7 @@ class EmployerService
             return false;
         }else{
 
-          return true;
+            return true;
         }
 
     }

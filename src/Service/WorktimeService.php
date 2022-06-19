@@ -28,30 +28,30 @@ class WorktimeService
     /**
      * @throws Exception
      */
-    public function getWorkTimeOfObject($objectId, $month=null, $year=null,$employer = null): array
+    public function getWorkTimeOfObject($objectId, $month = null, $year = null, $employer = null): array
     {
         //wenn kein Monat gegeben ist, lade Daten von aktuellem Monat
-        if($month + $year == null){
+        if ($month + $year == null) {
             $month = date('m');
             $year = date('Y');
         }
 
 
-        $firstDayInMonth = new DateTimeImmutable($year.'-'.$month.'-1');
-        $lastDayInMonth =  new DateTimeImmutable($year.'-'.$month.'-1');
+        $firstDayInMonth = new DateTimeImmutable($year . '-' . $month . '-1');
+        $lastDayInMonth = new DateTimeImmutable($year . '-' . $month . '-1');
 
         $lastDayInMonth = $lastDayInMonth->format('Y-m-t');
 
         //check if object belongs to admin company
         $object = $this->companyObjectRepository->findOneBy(['id' => $objectId]);
+
         $objectCompany = $object->getCompany();
         $adminCompany = $this->companyService->getCurrentCompany();
 
 
         //get all time entries of company
         if ($objectCompany === $adminCompany) {
-
-            return $this->formatTimeEntries($this->timeEntryRepository->findByDate($objectId,$firstDayInMonth,$lastDayInMonth,$employer));
+            return $this->formatTimeEntries($this->timeEntryRepository->findByDate($objectId, $firstDayInMonth, $lastDayInMonth, $employer));
         } else {
             throw new Exception("Keine Rechte dieses Objekt einzusehen");
         }
@@ -61,9 +61,7 @@ class WorktimeService
     private function formatTimeEntries($timeEntries): array
     {
         $formatArray = [];
-        $employerBuffer = [];
-        $timeEntryIndex = 0;
-        $bufferCounter = 0;
+
         $totalFinalHours = 0;
         $totalFinalMinutes = 0;
         foreach ($timeEntries as $timeEntry) {
@@ -75,65 +73,73 @@ class WorktimeService
             $timeEntryDateTime = $timeEntry->getCreatedAt();
             $timeEntryType = $timeEntry->getTimeEntryType();
             $autoCheckout = $timeEntry->getAutoCheckOut();
+            $uid = $timeEntry->getUid();
 
+            if ($uid != null) {
+                //wenn der Eintrag ein checkin ist, dann wissen wir den Startpunkt
+                if ($timeEntryType->getName() === "checkin") {
+                    $formatArray['worktimes'][$uid]['name'] = $employerFirstName . " " . $employerLastName;
+                    $formatArray['worktimes'][$uid]['start'] = $timeEntryDateTime;
+                    $formatArray['worktimes'][$uid]['autoCheckout'] = false;
 
-
-            if ($timeEntryType->getName() === "checkin") {
-                $formatArray['worktimes'][$timeEntryIndex]['name'] = $employerFirstName . " " . $employerLastName;
-                $formatArray['worktimes'][$timeEntryIndex]['start'] = $timeEntryDateTime;
-                $formatArray['worktimes'][$timeEntryIndex]['autoCheckout'] = false;
-                $employerBuffer[$bufferCounter][$employer->getId()] = $timeEntryIndex;
-                $timeEntryIndex++;
-                //buffer knows now, that employer X has checked id and stored his time entry index
-
-            } elseif ($timeEntryType->getName() === "checkout") {
-
-
-                if(isset($employerBuffer[0])){
-                    $employerBuffer = $employerBuffer[0];
+                } elseif ($timeEntryType->getName() === "checkout") {
+                    $formatArray['worktimes'][$uid]['end'] = $timeEntryDateTime;
                 }
 
-                foreach ($employerBuffer as $index => $bufferItem) {
-//                    dump($employerBuffer);
-                    if ($employerId === $index) {
-                        $formatArray['worktimes'][$bufferItem]['end'] = $timeEntryDateTime;
-
-                        //total time
-                        $timeDifference = $formatArray['worktimes'][$bufferItem]['start']->diff($formatArray['worktimes'][$bufferItem]['end']);
-
-                        $totalHours = $this->getTotalHours($timeDifference);
-                        $fullHours = floor($totalHours);
-
-                        $totalMinutes = $this->getTotalMinutes($timeDifference);
-                        $leftMinutes = $totalMinutes - $fullHours * 60;
-                        if (strlen($leftMinutes) === 1) {
-                            $leftMinutes = "0" . $leftMinutes;
-                        }
-                        $formatArray['worktimes'][$bufferItem]['sum'] = $fullHours . ":" . $leftMinutes;
-                      $totalFinalHours = $totalFinalHours + $fullHours;
-
-                      $totalFinalMinutes = $totalFinalMinutes + $leftMinutes;
-//                       if($autoCheckout === true){
-//                           $formatArray[$timeEntryIndex]['autoCheckout'] = true;
-//                       }
-                        unset($employerBuffer[$index]);
-                    }
-                }
             }
-
         }
 
-        //z.B. 110min sind 1h und 50min -> 1h
-        $hoursFromMinutes = floor($totalFinalMinutes / 60);
+        $arrayWithTotalForEachEmployer = $this->calculateSumForEveryWorker($formatArray);
 
-        $minutesFromMinutes = $totalFinalMinutes % 60;
+        return $this->calculateSumForWholeMonth($arrayWithTotalForEachEmployer);
+    }
 
-        if (strlen($minutesFromMinutes) === 1) {
-            $minutesFromMinutes = "0" . $minutesFromMinutes;
+    public function calculateSumForWholeMonth($formattedArray): array
+    {
+        $totalHours = 0;
+        $totalMinutes = 0;
+        foreach ($formattedArray['worktimes'] as $index => $workTime){
+            if(isset($workTime['sum'])){
+                $time = explode(":", $workTime['sum']);
+                $hours = intval($time[0]);
+                $minutes = intval($time[1]);
+
+                $totalHours += $hours;
+                $totalMinutes += $minutes;
+
+            }
         }
 
-        $formatArray['totalHours'] = $totalFinalHours+$hoursFromMinutes . ":".$minutesFromMinutes;
-        return $formatArray;
+        $totalMinutesLeft = $totalMinutes / 60;
+        $hoursFromMinutes = floor($totalMinutesLeft);
+        $totalHours += $hoursFromMinutes;
+        $totalMinutes -= floor($totalMinutesLeft)*60;
+
+
+        $formattedArray['totalHours'] = $totalHours . ":" . $totalMinutes;
+        return $formattedArray;
+    }
+
+    public function calculateSumForEveryWorker($formattedArray): array
+    {
+
+        foreach ($formattedArray['worktimes'] as $index => $workTime){
+
+            if(isset($workTime['end'])){
+                $timeDifference = $workTime['start']->diff($workTime['end']);
+
+                $totalHours = $this->getTotalHours($timeDifference);
+                $fullHours = floor($totalHours);
+
+                $totalMinutes = $this->getTotalMinutes($timeDifference);
+                $leftMinutes = $totalMinutes - $fullHours * 60;
+                if (strlen($leftMinutes) === 1) {
+                    $leftMinutes = "0" . $leftMinutes;
+                }
+                $formattedArray['worktimes'][$index]['sum'] = $fullHours . ":" . $leftMinutes;
+            }
+        }
+        return $formattedArray;
     }
 
     public function getTotalMinutes(DateInterval $int): float|int
@@ -164,6 +170,7 @@ class WorktimeService
 
     }
 
+
     /**
      * @throws Exception
      */
@@ -192,45 +199,45 @@ class WorktimeService
             $month = $dt->format('m');
             $year = $dt->format('Y');
 
-            if($month === '01'){
+            if ($month === '01') {
                 $mName = "Januar";
             }
-            if($month === '02'){
+            if ($month === '02') {
                 $mName = "Februar";
             }
-            if($month === '03'){
+            if ($month === '03') {
                 $mName = "März";
             }
-            if($month === '04'){
+            if ($month === '04') {
                 $mName = "April";
             }
-            if($month === '05'){
+            if ($month === '05') {
                 $mName = "Mai";
             }
-            if($month === '06'){
+            if ($month === '06') {
                 $mName = "Juni";
             }
-            if($month === '07'){
+            if ($month === '07') {
                 $mName = "Juli";
             }
-            if($month === '08'){
+            if ($month === '08') {
                 $mName = "August";
             }
-            if($month === '09'){
+            if ($month === '09') {
                 $mName = "September";
             }
-            if($month === '10'){
+            if ($month === '10') {
                 $mName = "Oktober";
             }
-            if($month === '11'){
+            if ($month === '11') {
                 $mName = "November";
             }
-            if($month === '12'){
+            if ($month === '12') {
                 $mName = "Dezember";
             }
 
             $months[$i]['month'] = $mName;
-            $months[$i]['monthNumber'] = (int) $month;
+            $months[$i]['monthNumber'] = (int)$month;
             $months[$i]['year'] = $year;
 
             $i++;

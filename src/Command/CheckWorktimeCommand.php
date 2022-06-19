@@ -104,6 +104,7 @@ class CheckWorktimeCommand extends Command
                         $timeEntry->setAutoCheckOut(true);
                         $timeEntry->setObject($object);
                         $timeEntry->setMainCheckin(false);
+                        $timeEntry->setUid($lastTimeEntry->getUid());
 
                         $this->entityManager->persist($timeEntry);
                         $this->entityManager->flush();
