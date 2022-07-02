@@ -149,4 +149,9 @@ class ObjectService
         $string = str_replace("´", "", $string);
         return $string;
     }
+
+    public function getObjectById( $objectId)
+    {
+        return $this->objectRepository->findOneBy(['id' => $objectId]);
+    }
 }

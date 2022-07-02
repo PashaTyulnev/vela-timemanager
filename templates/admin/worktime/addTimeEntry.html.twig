@@ -1,27 +1,43 @@
 <!-- Modal -->
-<div class="modal fade" id="timeEntryPopup" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="addTimeEntryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Zeitstempel
-                    von {{ employer.firstName }} {{ employer.lastName }}</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Zeiteintrag hinzufügen <br>(Objekt: {{object.name}})</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editTimeEntriesForm">
+            <div id="errorDiv"></div>
+            <form id="addTimeEntryForm">
+                <input type="hidden" name="object" value="{{object.id}}">
                 <div class="modal-body">
 
                     <table class="table">
-                        {% for timeEntry in timeEntries %}
-                            <tr>
-                                <td>{{ timeEntry['type'] }}</td>
-                                <td>
-                                    <input type="date" name="date-{{ timeEntry['id'] }}"
-                                           value="{{ timeEntry['time'] | date("Y-m-d") }}" required>
-                                    <input type="time" name="time-{{ timeEntry['id'] }}"
-                                           value="{{ timeEntry['time'] | date("H:i") }}" required>
-                                </td>
-                            </tr>
-                        {% endfor %}
+                        <tbody>
+                        <tr>
+                            <td>Mitarbeiter</td>
+                            <td>
+                                <select class="form-select" name="employer" required>
+                                    {% for employer in employers %}
+                                        <option value="{{employer.id}}">{{employer.firstname}} {{employer.lastname}}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Beginn</td>
+                            <td>
+                                <input type="date" name="date-begin" required="">
+                                <input type="time" name="time-begin" required="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Ende</td>
+                            <td>
+                                <input type="date" name="date-end" required="">
+                                <input type="time" name="time-end" required="">
+                            </td>
+                        </tr>
+                        </tbody>
                     </table>
 
                 </div>

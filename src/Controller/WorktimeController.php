@@ -4,7 +4,10 @@ namespace App\Controller;
 use App\Repository\CompanyObjectRepository;
 use App\Service\CompanyService;
 use App\Service\EmployerService;
+use App\Service\ObjectService;
 use App\Service\WorktimeService;
+use DateTimeImmutable;
+use DateTimeZone;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use JetBrains\PhpStorm\NoReturn;
@@ -22,12 +25,14 @@ class WorktimeController extends AbstractController
     private EmployerService $employerService;
     private WorktimeService $worktimeService;
     private CompanyService $companyService;
+    private ObjectService $objectService;
 
-    public function __construct(EmployerService $employerService, WorktimeService $worktimeService, CompanyService $companyService){
+    public function __construct(EmployerService $employerService, WorktimeService $worktimeService, CompanyService $companyService, ObjectService $objectService){
 
         $this->employerService = $employerService;
         $this->worktimeService = $worktimeService;
         $this->companyService = $companyService;
+        $this->objectService = $objectService;
     }
 
     /**
@@ -208,13 +213,53 @@ class WorktimeController extends AbstractController
         ]);
     }
 
-    #[Route('/save-time-entry')]
-    public function saveTimeEntry(Request $request): \Symfony\Component\HttpFoundation\Response
+    #[NoReturn] #[Route('/save-time-entry-change')]
+    public function saveTimeEntryChange(Request $request): \Symfony\Component\HttpFoundation\Response
     {
 
         $allTimeEntriesData = $request->request->all();
 
         $this->worktimeService->saveTimeEntryChange($allTimeEntriesData);
+
+        exit;
+
+    }
+
+
+    /**
+     * @throws \Exception
+     */
+    #[NoReturn] #[Route('/save-time-entry-new')]
+    public function saveTimeEntryNew(Request $request): \Symfony\Component\HttpFoundation\Response
+    {
+
+        //daraus muss man jetzt 2 timestamps machen
+        $dateBegin = $request->request->get('date-begin');
+        $timeBegin = $request->request->get('time-begin');
+
+        $dateEnd = $request->request->get('date-end');
+        $timeEnd = $request->request->get('time-end');
+
+        $employer = $request->request->get('employer');
+        $employer = intval($employer);
+
+        $object = $request->request->get('object');
+
+        //Zusammenflicken von Timestamps
+        $beginDate = new DateTimeImmutable($dateBegin . " " . $timeBegin, new DateTimeZone('Europe/Berlin'));
+        $endDate = new DateTimeImmutable($dateEnd . " " . $timeEnd, new DateTimeZone('Europe/Berlin'));
+
+        //Vergleiche Zeiten
+        if($beginDate > $endDate){
+
+            return $this->render('admin/messages/error.html.twig', [
+                'message'=>'Beginn darf nicht nach dem Ende sein!',
+            ]);
+
+        }else{
+            $this->employerService->userCheckAction(id:$employer,checkInType: 'checkin',manualEntryTimestamp: $beginDate,manualEntryObject: $object);
+            $this->employerService->userCheckAction(id:$employer,checkInType: 'checkout',manualEntryTimestamp: $endDate, manualEntryObject: $object);
+        }
 
         exit;
 
@@ -229,6 +274,21 @@ class WorktimeController extends AbstractController
         $this->worktimeService->deleteTimeEntries($uid);
 
         exit;
+
+    }
+
+    #[Route('/open-add-time-entry-modal')]
+    public function openAddTimeEntryModal(Request $request): \Symfony\Component\HttpFoundation\Response
+    {
+        $objectId = $request->request->get('objectId');
+
+        $employers = $this->employerService->getAllEmployers();
+        $object = $this->objectService->getObjectById($objectId);
+
+        return $this->render('admin/worktime/addTimeEntry.html.twig', [
+            'object' => $object,
+            'employers' => $employers
+        ]);
 
     }
 }

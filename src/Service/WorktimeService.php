@@ -103,10 +103,10 @@ class WorktimeService
         $totalHours = 0;
         $totalMinutes = 0;
 
-        if(isset($formattedArray['worktimes'])){
+        if (isset($formattedArray['worktimes'])) {
 
-            foreach ($formattedArray['worktimes'] as $index => $workTime){
-                if(isset($workTime['sum'])){
+            foreach ($formattedArray['worktimes'] as $index => $workTime) {
+                if (isset($workTime['sum'])) {
                     $time = explode(":", $workTime['sum']);
                     $hours = intval($time[0]);
                     $minutes = intval($time[1]);
@@ -120,7 +120,7 @@ class WorktimeService
             $totalMinutesLeft = $totalMinutes / 60;
             $hoursFromMinutes = floor($totalMinutesLeft);
             $totalHours += $hoursFromMinutes;
-            $totalMinutes -= floor($totalMinutesLeft)*60;
+            $totalMinutes -= floor($totalMinutesLeft) * 60;
         }
 
         $formattedArray['totalHours'] = $totalHours . ":" . $totalMinutes;
@@ -130,10 +130,10 @@ class WorktimeService
     public function calculateSumForEveryWorker($formattedArray): array
     {
 
-        if(isset($formattedArray['worktimes'])){
-            foreach ($formattedArray['worktimes'] as $index => $workTime){
+        if (isset($formattedArray['worktimes'])) {
+            foreach ($formattedArray['worktimes'] as $index => $workTime) {
 
-                if(isset($workTime['end'])){
+                if (isset($workTime['end'])) {
                     $timeDifference = $workTime['start']->diff($workTime['end']);
 
                     $totalHours = $this->getTotalHours($timeDifference);
@@ -148,8 +148,7 @@ class WorktimeService
                 }
             }
             return $formattedArray;
-        }
-        else{
+        } else {
             return [];
         }
 
@@ -263,14 +262,15 @@ class WorktimeService
     public function getTimeEntryGroup($uid): array
     {
 
-        return $this->formatTimeEntryGroup($this->timeEntryRepository->findBy(['uid'=>$uid]));
+        return $this->formatTimeEntryGroup($this->timeEntryRepository->findBy(['uid' => $uid]));
 
     }
 
-    public function formatTimeEntryGroup($timeEntries){
+    public function formatTimeEntryGroup($timeEntries)
+    {
         $array = [];
 
-        foreach ($timeEntries as $index => $timeEntry){
+        foreach ($timeEntries as $index => $timeEntry) {
 
             $employer = $timeEntry->getEmployer();
             $timeEntryDateTime = $timeEntry->getCreatedAt();
@@ -286,7 +286,7 @@ class WorktimeService
 
     public function getEmployerByUid($uid): ?\App\Entity\CompanyUser
     {
-        return $this->timeEntryRepository->findBy(['uid'=>$uid])[0]->getEmployer();
+        return $this->timeEntryRepository->findBy(['uid' => $uid])[0]->getEmployer();
     }
 
     /**
@@ -296,7 +296,7 @@ class WorktimeService
     {
         $idsToChange = [];
 
-        foreach ($allTimeEntriesData as $index => $date){
+        foreach ($allTimeEntriesData as $index => $date) {
             $mix = explode("-", $index);
             $id = $mix[1];
             $idsToChange[] = $id;
@@ -316,12 +316,12 @@ class WorktimeService
 
         $idsToChange = array_unique($idsToChange);
 
-        foreach ($idsToChange as $id){
-            $newDate = $allTimeEntriesData['date-'.$id];
-            $newTime = $allTimeEntriesData['time-'.$id];
-            $realTimeEntry = $this->timeEntryRepository->findOneBy(['id'=>$id]);
+        foreach ($idsToChange as $id) {
+            $newDate = $allTimeEntriesData['date-' . $id];
+            $newTime = $allTimeEntriesData['time-' . $id];
+            $realTimeEntry = $this->timeEntryRepository->findOneBy(['id' => $id]);
 
-            $dateToSave =  new DateTimeImmutable($newDate. " " . $newTime);
+            $dateToSave = new DateTimeImmutable($newDate . " " . $newTime);
 
             $realTimeEntry->setCreatedAt($dateToSave);
 
@@ -334,15 +334,26 @@ class WorktimeService
 
     public function deleteTimeEntries($uid): bool
     {
-        $timeEntries = $this->timeEntryRepository->findBy(['uid'=> $uid]);
+        $timeEntries = $this->timeEntryRepository->findBy(['uid' => $uid]);
 
-        foreach ($timeEntries as $timeEntry){
+        foreach ($timeEntries as $timeEntry) {
             $timeEntry->setRemoved(true);
             $this->entityManager->persist($timeEntry);
             $this->entityManager->flush();
         }
 
         return true;
+
+    }
+
+    /**
+     * @param $request
+     * @return void
+     *
+     * Hier kommt zuerst der Request an mit den Daten, die muss man rausholen
+     */
+    public function createManualTimeStampData($request)
+    {
 
     }
 

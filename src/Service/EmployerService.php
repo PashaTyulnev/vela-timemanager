@@ -6,12 +6,14 @@ use App\Entity\CompanyAppSettings;
 use App\Entity\CompanyUser;
 use App\Entity\TimeEntry;
 use App\Repository\CompanyAppSettingsRepository;
+use App\Repository\CompanyObjectRepository;
 use App\Repository\CompanyUserRepository;
 use App\Repository\TimeEntryRepository;
 use App\Repository\TimeEntryTypeRepository;
 use DateTimeImmutable;
 use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use JetBrains\PhpStorm\ArrayShape;
 
 class EmployerService
@@ -26,6 +28,7 @@ class EmployerService
     private DateTimeImmutable $date;
     private CompanyService $companyService;
     private CompanyAppSettingsRepository $companyAppSettingsRepository;
+    private CompanyObjectRepository $objectRepository;
 
 
     /**
@@ -37,6 +40,7 @@ class EmployerService
                                 TimeEntryRepository          $timeEntryRepository,
                                 CompanyService               $companyService,
                                 CompanyAppSettingsRepository $companyAppSettingsRepository,
+                                CompanyObjectRepository      $objectRepository
     )
     {
 
@@ -50,6 +54,7 @@ class EmployerService
         $this->date = new DateTimeImmutable('', new DateTimeZone('Europe/Berlin'));
         $this->companyAppSettingsRepository = $companyAppSettingsRepository;
 
+        $this->objectRepository = $objectRepository;
     }
 
     public function getNow(): DateTimeImmutable
@@ -59,7 +64,7 @@ class EmployerService
 
     public function getAllEmployers()
     {
-        return $this->employerRepository->findBy(['company'=>$this->companyService->getCurrentCompany()]);
+        return $this->employerRepository->findBy(['company' => $this->companyService->getCurrentCompany()]);
     }
 
     public function getEmployerById($id)
@@ -81,7 +86,7 @@ class EmployerService
      * Check in, check out oder Pause
      * @throws \Exception
      */
-    public function userCheckAction($id, $checkInType, $autoCheckoutTime = 0): TimeEntry
+    public function userCheckAction($id, $checkInType, $autoCheckoutTime = 0, $manualEntryTimestamp = null, $manualEntryObject = null): TimeEntry
     {
 
         //employer
@@ -108,14 +113,12 @@ class EmployerService
             //uniq id, damit man weiß, welche Einträge zusammengehören
             $uniqueId = uniqid();
 
-        }
-        //wenn es alles außer mainCheckin ist, muss man den letzten "mainCheckin" - Eintrag holen und von dem die uid
-        elseif(isset($isValid)){
+        } //wenn es alles außer mainCheckin ist, muss man den letzten "mainCheckin" - Eintrag holen und von dem die uid
+        elseif (isset($isValid)) {
 
-            $mainCheckin = $this->timeEntryRepository->findOneBy(['mainCheckin' => 1,'employer'=>$employer],['createdAt' => 'DESC']);
+            $mainCheckin = $this->timeEntryRepository->findOneBy(['mainCheckin' => 1, 'employer' => $employer], ['createdAt' => 'DESC']);
             $uniqueId = $mainCheckin->getUid() != null ? $mainCheckin->getUid() : null;
-        }
-        else{
+        } else {
 
             $uniqueId = null;
         }
@@ -124,12 +127,21 @@ class EmployerService
         $timeEntry->setEmployer($employer);
         $timeEntry->setTimeEntryType($this->timeEntryType);
 
+        //wenn auto-checkout
         if ($autoCheckoutTime !== 0) {
             $timeEntry->setCreatedAt($autoCheckoutTime);
-        } else {
-            $timeEntry->setCreatedAt($this->date);
         }
-        $timeEntry->setObject($this->companyService->getCurrentObject());
+
+        //wenn manueller Zeiteintrag
+        if ($manualEntryTimestamp !== null) {
+            $timeEntry->setCreatedAt($manualEntryTimestamp);
+            $object = $this->objectRepository->findOneBy(['id'=>$manualEntryObject]);
+            $timeEntry->setObject($object);
+        } //wenn ganz normaler Zeiteintrag durch Arbeiter
+        else {
+            $timeEntry->setCreatedAt($this->date);
+            $timeEntry->setObject($this->companyService->getCurrentObject());
+        }
 
 
         $this->entityManager->persist($timeEntry);
@@ -277,13 +289,12 @@ class EmployerService
     {
         $lastTimeEntry = $this->getLastTimeEntryOfEmployer($employer);
 
-        if($lastTimeEntry != null){
+        if ($lastTimeEntry != null) {
             if ($lastTimeEntry->getTimeEntryType()->getName() === "checkin") {
                 $mainCheckin = $this->getLastMainCheckin($employer);
-                if($mainCheckin != null){
+                if ($mainCheckin != null) {
                     return "Du arbeitest seit " . $mainCheckin->getCreatedAt()->format("d.m.Y H:i");
-                }
-                else{
+                } else {
                     return "Du arbeitest seit " . $lastTimeEntry->getCreatedAt()->format("d.m.Y H:i");
                 }
 
@@ -295,8 +306,7 @@ class EmployerService
                 //if pause, look what was before pause
                 return "Du machst Pause seit " . $lastTimeEntry->getCreatedAt()->format("d.m.Y H:i");
             }
-        }
-        else {
+        } else {
             return "Das ist deine erste Benutzung dieser App. Bitte check dich ein.";
         }
         return "";
@@ -316,10 +326,10 @@ class EmployerService
         $currentCompany = $this->companyService->getCurrentCompany();
         $newEmployer = new CompanyUser();
 
-        if(!$request->get('firstName')){
+        if (!$request->get('firstName')) {
             throw new \Exception("Bitte geben Sie einen Vornamen ein!");
         }
-        if(!$request->get('lastName')){
+        if (!$request->get('lastName')) {
             throw new \Exception("Bitte geben Sie einen Nachnamen ein!");
         }
 
@@ -327,13 +337,13 @@ class EmployerService
         $lastName = $request->get('lastName');
 
         //wenn pin automatisch generiert werden soll
-        if(!$request->get('pin')){
+        if (!$request->get('pin')) {
             $pin = $this->createNewEmployerPin();
-        }else{
+        } else {
             $pin = $request->get('pin');
             $pinExists = $this->checkSamePin($pin);
 
-            if($pinExists){
+            if ($pinExists) {
                 throw new \Exception("Person mit dieser Pin ist bereits angelegt!");
             }
         }
@@ -357,14 +367,14 @@ class EmployerService
         $currentCompany = $this->companyService->getCurrentCompany();
 
         // 4 stellig
-        $pin = rand(1111,9888);
+        $pin = rand(1111, 9888);
 
         $pinExists = $this->checkSamePin($pin);
 
         //wenn es niemanden mit dieser PIN in dieser Firma gibt, dann kann man die nehmen
-        if(!$pinExists){
+        if (!$pinExists) {
             return $pin;
-        }else{
+        } else {
             $this->createNewEmployerPin();
         }
         return 0;
@@ -373,11 +383,11 @@ class EmployerService
     public function checkSamePin($pin): bool
     {
         $currentCompany = $this->companyService->getCurrentCompany();
-        $pinExists = $this->employerRepository->findBy(['pin' => $pin,'company'=>$currentCompany]);
+        $pinExists = $this->employerRepository->findBy(['pin' => $pin, 'company' => $currentCompany]);
 
-        if($pinExists === []){
+        if ($pinExists === []) {
             return false;
-        }else{
+        } else {
 
             return true;
         }
