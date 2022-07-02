@@ -29,6 +29,7 @@
         "symfony/twig-bundle": "6.0.*",
         "symfony/validator": "6.0.*",
         "symfony/webpack-encore-bundle": "^1.14",
+        "symfony/web-profiler-bundle": "6.0.*",
         "symfony/yaml": "6.0.*",
         "symfonycasts/verify-email-bundle": "^1.9",
         "twbs/bootstrap": "5.0.2",

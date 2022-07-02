@@ -93,11 +93,24 @@ function activateListener() {
                 },
                 method: 'POST',
             }).then(function (response) {
-
                 loadWorkTimeByObjectId(objectId)
             })
         }
 
+    })
+
+    $('#addTimeEntry').on('click', function () {
+        $.ajax({
+            url: '/open-add-time-entry-modal',
+            method: 'POST',
+        }).then(function (response) {
+
+            $('#modalContainer').html(response)
+
+            let timeEntryModal = new bootstrap.Modal(document.getElementById('addTimeEntryModal'))
+            timeEntryModal.show()
+
+        })
     })
 
 }

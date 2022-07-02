@@ -11,9 +11,13 @@
         width: 100%;
         display: block;
     }
-    #exportPdf{
+    #exportPdf,#addTimeEntry{
         width: 100%;
         display: block;
+    }
+
+    #addTimeEntry{
+        margin-top: 10px;
     }
     td{
         padding:5px!important;
@@ -47,4 +51,8 @@
 .trash,.edit{
     margin-right: 10px;
     display: inline;
+}
+
+#editTimeEntriesForm select,input{
+    margin-bottom: 10px;
 }

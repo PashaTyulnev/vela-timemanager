@@ -1,0 +1,36 @@
+<!-- Modal -->
+<div class="modal fade" id="timeEntryPopup" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Zeitstempel
+                    von {{ employer.firstName }} {{ employer.lastName }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editTimeEntriesForm">
+                <div class="modal-body">
+
+                    <table class="table">
+                        {% for timeEntry in timeEntries %}
+                            <tr>
+                                <td>{{ timeEntry['type'] }}</td>
+                                <td>
+                                    <input type="date" name="date-{{ timeEntry['id'] }}"
+                                           value="{{ timeEntry['time'] | date("Y-m-d") }}" required>
+                                    <input type="time" name="time-{{ timeEntry['id'] }}"
+                                           value="{{ timeEntry['time'] | date("H:i") }}" required>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

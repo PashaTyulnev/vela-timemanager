@@ -54,7 +54,7 @@ class WorktimeController extends AbstractController
         }
 
         if($request->request->get("employer") !== null){
-           $employer = $request->request->get("employer");
+            $employer = $request->request->get("employer");
         }
 
 
@@ -65,11 +65,11 @@ class WorktimeController extends AbstractController
             $employer = null;
         }
 
-
         $timeEntriesOfObject = $this->worktimeService->getWorkTimeOfObject($object,$month,$year,$employer);
         $monthsForSelect = $this->worktimeService->getMonthsForSelect($object);
         $allEmployers = $this->employerService->getAllEmployers();
-        
+
+
         return $this->render('admin/worktime/loadWorktime.html.twig', [
             'timeEntries' => $timeEntriesOfObject,
             'objectId' => $object,

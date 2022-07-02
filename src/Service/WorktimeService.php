@@ -102,23 +102,26 @@ class WorktimeService
     {
         $totalHours = 0;
         $totalMinutes = 0;
-        foreach ($formattedArray['worktimes'] as $index => $workTime){
-            if(isset($workTime['sum'])){
-                $time = explode(":", $workTime['sum']);
-                $hours = intval($time[0]);
-                $minutes = intval($time[1]);
 
-                $totalHours += $hours;
-                $totalMinutes += $minutes;
+        if(isset($formattedArray['worktimes'])){
 
+            foreach ($formattedArray['worktimes'] as $index => $workTime){
+                if(isset($workTime['sum'])){
+                    $time = explode(":", $workTime['sum']);
+                    $hours = intval($time[0]);
+                    $minutes = intval($time[1]);
+
+                    $totalHours += $hours;
+                    $totalMinutes += $minutes;
+
+                }
             }
+
+            $totalMinutesLeft = $totalMinutes / 60;
+            $hoursFromMinutes = floor($totalMinutesLeft);
+            $totalHours += $hoursFromMinutes;
+            $totalMinutes -= floor($totalMinutesLeft)*60;
         }
-
-        $totalMinutesLeft = $totalMinutes / 60;
-        $hoursFromMinutes = floor($totalMinutesLeft);
-        $totalHours += $hoursFromMinutes;
-        $totalMinutes -= floor($totalMinutesLeft)*60;
-
 
         $formattedArray['totalHours'] = $totalHours . ":" . $totalMinutes;
         return $formattedArray;
@@ -127,23 +130,30 @@ class WorktimeService
     public function calculateSumForEveryWorker($formattedArray): array
     {
 
-        foreach ($formattedArray['worktimes'] as $index => $workTime){
+        if(isset($formattedArray['worktimes'])){
+            foreach ($formattedArray['worktimes'] as $index => $workTime){
 
-            if(isset($workTime['end'])){
-                $timeDifference = $workTime['start']->diff($workTime['end']);
+                if(isset($workTime['end'])){
+                    $timeDifference = $workTime['start']->diff($workTime['end']);
 
-                $totalHours = $this->getTotalHours($timeDifference);
-                $fullHours = floor($totalHours);
+                    $totalHours = $this->getTotalHours($timeDifference);
+                    $fullHours = floor($totalHours);
 
-                $totalMinutes = $this->getTotalMinutes($timeDifference);
-                $leftMinutes = $totalMinutes - $fullHours * 60;
-                if (strlen($leftMinutes) === 1) {
-                    $leftMinutes = "0" . $leftMinutes;
+                    $totalMinutes = $this->getTotalMinutes($timeDifference);
+                    $leftMinutes = $totalMinutes - $fullHours * 60;
+                    if (strlen($leftMinutes) === 1) {
+                        $leftMinutes = "0" . $leftMinutes;
+                    }
+                    $formattedArray['worktimes'][$index]['sum'] = $fullHours . ":" . $leftMinutes;
                 }
-                $formattedArray['worktimes'][$index]['sum'] = $fullHours . ":" . $leftMinutes;
             }
+            return $formattedArray;
         }
-        return $formattedArray;
+        else{
+            return [];
+        }
+
+
     }
 
     public function getTotalMinutes(DateInterval $int): float|int
@@ -194,7 +204,7 @@ class WorktimeService
         // jetzt kann man iterieren
 
         $begin = new DateTime($firstDay);
-        $end = new DateTime($lastDay);
+        $end = new DateTime();
 
         $interval = DateInterval::createFromDateString('1 month');
         $period = new DatePeriod($begin, $interval, $end);

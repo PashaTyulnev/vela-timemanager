@@ -1,36 +1,76 @@
-<!-- Modal -->
-<div class="modal fade" id="timeEntryPopup" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Zeitstempel
-                    von {{ employer.firstName }} {{ employer.lastName }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="editTimeEntriesForm">
-                <div class="modal-body">
 
-                    <table class="table">
-                        {% for timeEntry in timeEntries %}
-                            <tr>
-                                <td>{{ timeEntry['type'] }}</td>
-                                <td>
-                                    <input type="date" name="date-{{ timeEntry['id'] }}"
-                                           value="{{ timeEntry['time'] | date("Y-m-d") }}" required>
-                                    <input type="time" name="time-{{ timeEntry['id'] }}"
-                                           value="{{ timeEntry['time'] | date("H:i") }}" required>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
+<form method="post" id="exportForm" action="/export-pdf">
+    <div class="row exportContainer">
+        <div class="col-auto col-12 col-md-2">
+            <select class="form-select" aria-label="Default select example" name="datetime" id="monthSelect">
+                {% for date in monthsOfSelect %}
+                    <option class="monthSelect"
+                            data-object="{{objectId}}"
+                            value="{{ date['year'] }}-{{ date['monthNumber'] }}"{% if date['monthNumber'] == monthNow and date['year'] == yearNow %} selected {% endif %}>{{ date['month'] }} {{ date['year'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto col-12 col-md-2">
+            <select class="form-select" aria-label="Default select example" name="employer" id="employerSelect">
+                <option class="employerSelect"  data-object="{{objectId}}" value="all" {% if selectedEmployer is defined and selectedEmployer == null%}selected{%endif%}>Alle</option>
+                {% for employer in employers %}
+                    <option class="employerSelect"  data-object="{{objectId}}" value="{{employer.id}}" {% if selectedEmployer is defined and selectedEmployer == employer.id %}selected{%endif%}>{{employer.firstName}} {{employer.lastName}}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
-                    <button type="submit" class="btn btn-primary">Speichern</button>
-                </div>
-            </form>
+
+        <div class="col-auto col-12 col-md-2">
+            <button type="submit" class="btn btn-danger" id="exportPdf">
+                <i class="bi bi-filetype-pdf"></i> Export PDF
+            </button>
         </div>
     </div>
-</div>
+    <input type="hidden" name="objectId" value="{{ objectId }}" id="objectId">
+</form>
+<table id="worktime">
+    <thead>
+    <tr>
+        <td>Arbeiter</td>
+        <td>Beginn</td>
+        <td>Ende</td>
+        <td>Gesamt ({{timeEntries['totalHours']}}h)</td>
+        <td></td>
+    </tr>
+    </thead>
+    <tbody id="worktimeContent">
+    {% if timeEntries['worktimes'] is defined %}
+        {% for uid,timeEntry in timeEntries['worktimes'] %}
+            <tr data-uid="{{uid}}">
 
+                <td>{{ timeEntry['name'] }}</td>
+                <td>{{ timeEntry['start'] | date("d.m.Y H:i") }}</td>
+                <td>
+                    {% if timeEntry['end'] is defined %}
+                        {{ timeEntry['end'] | date("d.m.Y H:i") }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{% if timeEntry['sum'] is defined %}
+                        {{ timeEntry['sum'] }}
+                    {% else %}
+                        -
+                    {% endif %}</td>
+                <td>
+                    <div class="edit editTimeEntry" > <i class="bi bi-pencil-square "></i></div>
+                    <div class="trash deleteTimeEntry"> <i class="bi bi-trash3 "></i></div>
+                </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
+
+<div id="modalContainer"></div>
+
+<script>
+    destroyWorktimeTable();
+    createWorktimeTable();
+    activateListener();
+</script>

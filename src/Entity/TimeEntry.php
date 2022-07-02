@@ -23,7 +23,6 @@ class TimeEntry
     #[ORM\JoinColumn(nullable: false)]
     private $employer;
 
-
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $autoCheckOut;
 

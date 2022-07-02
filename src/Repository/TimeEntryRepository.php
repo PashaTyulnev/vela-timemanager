@@ -84,6 +84,7 @@ class TimeEntryRepository extends ServiceEntityRepository
     public function findByDate($objectId, $from, $to,$employer)
     {
 
+
         $result =
             $this->createQueryBuilder('t')
                 ->andWhere('t.object = :id')
